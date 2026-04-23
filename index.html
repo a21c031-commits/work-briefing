@@ -80,18 +80,23 @@
             color: #495057;
         }
 
-        .input-section textarea {
+        .input-section textarea,
+        .input-section input {
             width: 100%;
-            min-height: 200px;
             padding: 16px;
             border: 1px solid #ced4da;
             border-radius: 8px;
             font-size: 15px;
-            resize: vertical;
             transition: border-color 0.2s, box-shadow 0.2s;
         }
 
-        .input-section textarea:focus {
+        .input-section textarea {
+            min-height: 200px;
+            resize: vertical;
+        }
+
+        .input-section textarea:focus,
+        .input-section input:focus {
             outline: none;
             border-color: #4dabf7;
             box-shadow: 0 0 0 3px rgba(77, 171, 247, 0.15);
@@ -185,6 +190,58 @@
             word-break: break-word;
         }
 
+        .history-section {
+            background: #fff;
+            border: 1px solid #dee2e6;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .history-section h2 {
+            font-size: 18px;
+            margin-bottom: 16px;
+            color: #212529;
+        }
+
+        .history-list {
+            display: grid;
+            gap: 14px;
+        }
+
+        .history-card {
+            border: 1px solid #dee2e6;
+            border-radius: 10px;
+            padding: 18px;
+            background: #f8f9fa;
+        }
+
+        .history-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+        }
+
+        .history-card-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #212529;
+        }
+
+        .history-card-subtitle {
+            font-size: 13px;
+            color: #6c757d;
+        }
+
+        .history-card-content {
+            font-size: 14px;
+            color: #495057;
+            white-space: pre-wrap;
+        }
+
         .loading {
             display: none;
             text-align: center;
@@ -240,6 +297,13 @@
         <h1>📋 Work Briefing</h1>
 
         <div class="api-key-section">
+            <label for="supabaseUrl">Supabase URL</label>
+            <input type="text" id="supabaseUrl" value="https://xenuivpmvibjulqwkmbo.supabase.co" />
+            <label for="supabaseKey">Supabase anon/public key</label>
+            <input type="password" id="supabaseKey" value="sb_publishable_1AkyCRBTKIe4FJ6EIAZWaw_guTvV8ft" />
+        </div>
+
+        <div class="api-key-section">
             <label for="apiKey">Anthropic API Key</label>
             <input type="password" id="apiKey" placeholder="sk-ant-..." />
         </div>
@@ -247,6 +311,8 @@
         <div class="input-section">
             <label for="inputText">딩톡 대화 또는 상황 설명을 붙여넣으세요</label>
             <textarea id="inputText" placeholder="예: 오늘 미팅에서 프로젝트 진행 상황에 대해 논의했고, 다음 주까지 디자인稿을 제출해야 한다는 합의가 있었습니다..."></textarea>
+            <label for="category" style="margin-top:16px; display:block; font-size:14px; font-weight:600; color:#495057;">카테고리</label>
+            <input type="text" id="category" placeholder="예: 고객지원 / 기획 / 회의" />
         </div>
 
         <div class="button-section">
@@ -293,17 +359,43 @@
                 <div class="result-card-content" id="deptContent"></div>
             </div>
         </div>
+
+        <div class="history-section">
+            <h2>과거 분석 기록</h2>
+            <div class="history-list" id="historyList">
+                <p>Supabase URL과 Key를 입력하면 과거 분석 기록이 표시됩니다.</p>
+            </div>
+        </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
     <script>
         const analyzeBtn = document.getElementById('analyzeBtn');
         const loading = document.getElementById('loading');
         const results = document.getElementById('results');
         const errorMessage = document.getElementById('errorMessage');
+        const historyList = document.getElementById('historyList');
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            updateHistoryMessage('Supabase URL과 Key를 입력하면 과거 분석 기록이 표시됩니다.');
+            try {
+                await loadHistory();
+            } catch (e) {
+                // Ignore errors on load
+            }
+        });
 
         analyzeBtn.addEventListener('click', async () => {
+            const supabaseUrl = document.getElementById('supabaseUrl').value.trim();
+            const supabaseKey = document.getElementById('supabaseKey').value.trim();
             const apiKey = document.getElementById('apiKey').value.trim();
             const inputText = document.getElementById('inputText').value.trim();
+            const category = document.getElementById('category').value.trim() || '일반';
+
+            if (!supabaseUrl || !supabaseKey) {
+                showError('Supabase URL과 Key를 입력해주세요.');
+                return;
+            }
 
             if (!apiKey) {
                 showError('API Key를 입력해주세요.');
@@ -366,8 +458,6 @@ JSON만 출력하고 다른 설명은 하지 마세요.`
 
                 const data = await response.json();
                 const content = data.content[0].text;
-                
-                // Parse JSON from response
                 const jsonMatch = content.match(/\{[\s\S]*\}/);
                 if (!jsonMatch) {
                     throw new Error('응답 형식이 올바르지 않습니다.');
@@ -375,6 +465,8 @@ JSON만 출력하고 다른 설명은 하지 마세요.`
 
                 const result = JSON.parse(jsonMatch[0]);
                 displayResults(result);
+                await saveResultToSupabase(result, category);
+                await loadHistory();
 
             } catch (error) {
                 showError('오류가 발생했습니다: ' + error.message);
@@ -384,21 +476,93 @@ JSON만 출력하고 다른 설명은 하지 마세요.`
             }
         });
 
+        function getSupabaseClient() {
+            const supabaseUrl = document.getElementById('supabaseUrl').value.trim();
+            const supabaseKey = document.getElementById('supabaseKey').value.trim();
+            if (!supabaseUrl || !supabaseKey) {
+                throw new Error('Supabase URL과 Key를 입력해주세요.');
+            }
+            return supabase.createClient(supabaseUrl, supabaseKey);
+        }
+
+        async function saveResultToSupabase(result, category) {
+            const client = getSupabaseClient();
+            const { error } = await client.from('briefings').insert([{
+                input_language: result.detectedLanguage,
+                summary: result.summary,
+                translation: result.translation,
+                manager_report: result.guangmingMessage,
+                department_summary: result.deptSummary,
+                category
+            }]);
+
+            if (error) {
+                throw new Error(error.message);
+            }
+        }
+
+        async function loadHistory() {
+            const supabaseUrl = document.getElementById('supabaseUrl').value.trim();
+            const supabaseKey = document.getElementById('supabaseKey').value.trim();
+            if (!supabaseUrl || !supabaseKey) {
+                updateHistoryMessage('Supabase URL과 Key를 입력하면 과거 분석 기록이 표시됩니다.');
+                return;
+            }
+            try {
+                const client = getSupabaseClient();
+                const { data, error } = await client
+                    .from('briefings')
+                    .select('id, created_at, input_language, summary, translation, manager_report, department_summary, category')
+                    .order('created_at', { ascending: false })
+                    .limit(20);
+
+                if (error) {
+                    throw error;
+                }
+
+                renderHistory(data || []);
+            } catch (error) {
+                updateHistoryMessage('기록을 불러올 수 없습니다. Supabase 설정을 확인해주세요.');
+            }
+        }
+
+        function renderHistory(entries) {
+            if (!entries.length) {
+                updateHistoryMessage('저장된 기록이 없습니다.');
+                return;
+            }
+
+            historyList.innerHTML = '';
+            entries.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'history-card';
+                card.innerHTML = `
+                    <div class="history-card-header">
+                        <div>
+                            <div class="history-card-title">${item.category || '일반'} · ${item.input_language === 'ko' ? '한국어' : '중국어'}</div>
+                            <div class="history-card-subtitle">${new Date(item.created_at).toLocaleString('ko-KR')}</div>
+                        </div>
+                    </div>
+                    <div class="history-card-content">
+                        <strong>요약:</strong> ${item.summary}<br />
+                        <strong>공유용 요약:</strong> ${item.department_summary}
+                    </div>
+                `;
+                historyList.appendChild(card);
+            });
+        }
+
+        function updateHistoryMessage(message) {
+            historyList.innerHTML = `<p style="color:#6c757d; font-size:14px;">${message}</p>`;
+        }
+
         function displayResults(result) {
-            // Summary
             document.getElementById('summaryContent').textContent = result.summary;
             document.getElementById('summaryLang').textContent = result.detectedLanguage === 'ko' ? '한국어' : '중국어';
-
-            // Translation
             document.getElementById('translateContent').textContent = result.translation;
             document.getElementById('translateLang').textContent = result.detectedLanguage === 'ko' ? '중국어' : '한국어';
-
-            // Guangming message
             document.getElementById('guangmingContent').textContent = result.guangmingMessage;
-
-            // Department summary
             document.getElementById('deptContent').textContent = result.deptSummary;
-
             results.classList.add('show');
         }
 
