@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Work.Translate</title>
+<title>Sangxi's Work.Translate</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -86,8 +86,9 @@ header { background: var(--surface); border-bottom: 0.5px solid var(--border); h
 .meeting-hint.show { display: block; }
 
 /* INPUT PANELS */
-.panels-wrap { background: var(--surface); border: 0.5px solid var(--border); border-radius: 12px; overflow: hidden; }
-.panels-grid { display: grid; grid-template-columns: 1fr 40px 1fr; }
+.panels-wrap { background: var(--surface); border: 0.5px solid var(--border); border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; }
+.panels-body { display: grid; grid-template-columns: 1fr 40px 1fr; flex: 1; }
+.panels-body { display: grid; grid-template-columns: 1fr 40px 1fr; flex: 1; }
 .panel { padding: 14px 16px; }
 .panel-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
 .panel-lang { font-size: 13px; font-weight: 500; color: var(--text); display: flex; align-items: center; gap: 4px; }
@@ -101,7 +102,7 @@ header { background: var(--surface); border-bottom: 0.5px solid var(--border); h
 .swap-btn { width: 28px; height: 28px; border: 0.5px solid var(--border); border-radius: 50%; background: var(--surface); cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--muted); transition: all 0.15s; }
 .swap-btn:hover { border-color: var(--green); color: var(--green); }
 .swap-btn svg { width: 14px; height: 14px; }
-.panel-footer { grid-column: 1 / -1; display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; border-top: 0.5px solid var(--border); background: #fafafa; gap: 12px; }
+.panel-footer { display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; border-top: 0.5px solid var(--border); background: #fafafa; gap: 12px; flex-shrink: 0; }
 .tone-row { display: flex; align-items: center; gap: 8px; }
 .tone-label { font-size: 12px; color: var(--muted); }
 .tone-btns { display: flex; gap: 4px; }
@@ -167,10 +168,8 @@ header { background: var(--surface); border-bottom: 0.5px solid var(--border); h
 
 <header>
   <a class="logo" href="#">
-    <div class="logo-icon">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"/></svg>
-    </div>
-    <span class="logo-text">Work<span class="logo-dot">.</span>Translate</span>
+    <div class="logo-icon">🩷</div>
+    <span class="logo-text">🩷 Sangxi's Work<span class="logo-dot">.</span>Translate</span>
   </a>
 
   <div class="header-tabs">
@@ -209,7 +208,7 @@ header { background: var(--surface); border-bottom: 0.5px solid var(--border); h
       <button class="sidebar-clear" onclick="clearAllHistory()">전체삭제</button>
     </div>
     <div class="sidebar-list" id="sidebarList">
-      <div class="sidebar-empty">분석하기를 누르면<br>자동으로 저장됩니다<br><br>📌 저장 버튼으로 고정 가능</div>
+      <div class="sidebar-empty">💫 분석하기를 누르면<br>자동으로 저장됩니다<br><br>📌 저장 버튼으로 고정 가능</div>
     </div>
   </div>
 
@@ -229,7 +228,7 @@ header { background: var(--surface); border-bottom: 0.5px solid var(--border); h
     </div>
 
     <div class="panels-wrap">
-      <div class="panels-grid">
+      <div class="panels-body">
         <div class="panel">
           <div class="panel-header">
             <div class="panel-lang" id="inputLangLabel">
@@ -252,7 +251,8 @@ header { background: var(--surface); border-bottom: 0.5px solid var(--border); h
           </div>
           <div style="font-size:13px;color:#c4c9d4;line-height:1.7;" id="previewText">분석하기를 누르면 여기에 요약이 표시됩니다</div>
         </div>
-        <div class="panel-footer">
+      </div>
+      <div class="panel-footer">
           <div class="tone-row">
             <span class="tone-label">톤</span>
             <div class="tone-btns">
@@ -264,16 +264,14 @@ header { background: var(--surface); border-bottom: 0.5px solid var(--border); h
           <div class="footer-right">
             <span class="char-count" id="charCount">0 / 3000</span>
             <button class="save-btn" onclick="saveCurrentToHistory()" title="현재 결과 저장">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-              저장
+              💾 저장
             </button>
             <button class="analyze-btn" id="analyzeBtn" onclick="analyze()">
               <div class="spinner" id="spinner"></div>
               <svg id="analyzeBtnIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-              <span id="analyzeBtnText">분석하기</span>
+              <span id="analyzeBtnText">✨ 분석하기</span>
             </button>
           </div>
-        </div>
       </div>
     </div>
 
@@ -821,7 +819,7 @@ async function loadHistory() {
 function renderSidebar(list) {
   const el = document.getElementById('sidebarList');
   document.getElementById('sidebarCount').textContent = list.length;
-  if (!list.length) { el.innerHTML = '<div class="sidebar-empty">분석하기를 누르면<br>자동으로 저장됩니다<br><br>📌 저장 버튼으로 고정 가능</div>'; return; }
+  if (!list.length) { el.innerHTML = '<div class="sidebar-empty">💫 분석하기를 누르면<br>자동으로 저장됩니다<br><br>📌 저장 버튼으로 고정 가능</div>'; return; }
   const modeLabels = { dingtalk:'딩톡', meeting:'회의록', letter:'공문' };
   el.innerHTML = list.map(item => {
     const d = new Date(item.created_at);
