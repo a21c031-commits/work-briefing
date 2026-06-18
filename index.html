@@ -86,7 +86,7 @@ header { background: var(--surface); border-bottom: 0.5px solid var(--border); h
 .meeting-hint.show { display: block; }
 
 /* INPUT PANELS */
-.panels-wrap { background: var(--surface); border: 0.5px solid var(--border); border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; }
+.panels-wrap { background: var(--surface); border: 0.5px solid var(--border); border-radius: 12px; display: flex; flex-direction: column; }
 .panels-body { display: grid; grid-template-columns: 1fr 40px 1fr; flex: 1; }
 .panels-body { display: grid; grid-template-columns: 1fr 40px 1fr; flex: 1; }
 .panel { padding: 14px 16px; }
@@ -96,7 +96,7 @@ header { background: var(--surface); border-bottom: 0.5px solid var(--border); h
 .panel-badge { font-size: 10px; padding: 2px 8px; border-radius: 20px; }
 .panel-badge.detected { background: var(--green-light); color: var(--green-dark); }
 .panel-badge.plain { background: #f3f4f6; color: var(--muted); }
-.panel-textarea { width: 100%; min-height: 120px; resize: vertical; border: none; outline: none; font-family: inherit; font-size: 13px; line-height: 1.7; color: var(--text); background: transparent; }
+.panel-textarea { width: 100%; height: 120px; max-height: 120px; resize: none; border: none; outline: none; font-family: inherit; font-size: 13px; line-height: 1.7; color: var(--text); background: transparent; }
 .panel-textarea::placeholder { color: #c4c9d4; }
 .panel-divider { display: flex; align-items: center; justify-content: center; border-left: 0.5px solid var(--border); border-right: 0.5px solid var(--border); }
 .swap-btn { width: 28px; height: 28px; border: 0.5px solid var(--border); border-radius: 50%; background: var(--surface); cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--muted); transition: all 0.15s; }
