@@ -652,8 +652,25 @@ async function analyze() {
       if (jsonMatch) cleaned = jsonMatch[0];
       parsed = JSON.parse(cleaned);
     } catch {
-      console.error('Parse failed, raw response:', raw);
-      throw new Error('응답 파싱 오류. 다시 시도해주세요. (raw: ' + raw.slice(0, 100) + ')');
+      // JSON 파싱 실패 시 값 직접 추출 시도
+      try {
+        const extractField = (key) => {
+          const re = new RegExp('"' + key + '"\\s*:\\s*"([\\s\\S]*?)"(?=\\s*[,}])');
+          const m = raw.replace(/\\"/g, '##QUOTE##').match(re);
+          return m ? m[1].replace(/##QUOTE##/g, '"').replace(/\\n/g, '\n') : '';
+        };
+        if (currentMode === 'dingtalk') {
+          parsed = { summary: extractField('summary'), translate: extractField('translate'), report: extractField('report'), action: extractField('action'), oneline: extractField('oneline') };
+        } else if (currentMode === 'meeting') {
+          parsed = { minutes: extractField('minutes'), minutes_ko: extractField('minutes_ko'), issue: extractField('issue') };
+        } else {
+          parsed = { letter_ko: extractField('letter_ko'), letter_zh: extractField('letter_zh'), letter_point: extractField('letter_point') };
+        }
+        if (!parsed.summary && !parsed.minutes && !parsed.letter_ko) throw new Error('empty');
+      } catch {
+        console.error('Parse failed:', raw.slice(0, 200));
+        throw new Error('응답 파싱 오류. 다시 시도해주세요.');
+      }
     }
 
     if (currentMode === 'dingtalk') {
