@@ -3,395 +3,218 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Work Briefing · 딩톡 분석기</title>
+<title>Work Briefing · 상희 전용</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg: #f7f6f2;
-    --surface: #ffffff;
-    --border: #e4e2da;
-    --text: #1a1917;
-    --muted: #7a7770;
-    --accent: #2d5a3d;
-    --accent-light: #e8f0ea;
-    --accent-muted: #6b9e7a;
-    --tag-bg: #f0ede6;
-    --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04);
-  }
+:root {
+  --bg: #f7f6f2;
+  --surface: #ffffff;
+  --border: #e4e2da;
+  --text: #1a1917;
+  --muted: #7a7770;
+  --accent: #2d5a3d;
+  --accent-light: #e8f0ea;
+  --accent-muted: #6b9e7a;
+  --tag-bg: #f0ede6;
+  --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04);
+  --mode-dingtalk: #2d5a3d;
+  --mode-meeting: #3d4a6b;
+  --mode-letter: #6b3d2d;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Noto Sans KR', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  font-size: 14px;
+  line-height: 1.6;
+}
+header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 16px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.logo { display: flex; align-items: baseline; gap: 10px; }
+.logo-main { font-family: 'Noto Serif KR', serif; font-size: 18px; font-weight: 600; color: var(--accent); letter-spacing: -0.3px; }
+.logo-sub { font-size: 11px; color: var(--muted); letter-spacing: 0.5px; }
+.api-row { display: flex; align-items: center; gap: 8px; }
+.api-row label { font-size: 11px; color: var(--muted); white-space: nowrap; }
+.api-input {
+  font-family: 'Noto Sans KR', sans-serif; font-size: 12px;
+  padding: 6px 12px; border: 1px solid var(--border); border-radius: 6px;
+  background: var(--bg); color: var(--text); width: 200px; outline: none;
+  transition: border-color 0.2s;
+}
+.api-input:focus { border-color: var(--accent-muted); }
+.api-status { width: 7px; height: 7px; border-radius: 50%; background: #ddd; flex-shrink: 0; transition: background 0.3s; }
+.api-status.ok { background: #4caf50; }
+.api-status.err { background: #e57373; }
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+/* MODE TABS */
+.mode-tabs {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 0 32px;
+  display: flex;
+  gap: 0;
+}
+.mode-tab {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 13px; font-weight: 500;
+  padding: 12px 20px;
+  border: none; background: none;
+  color: var(--muted);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.15s;
+  display: flex; align-items: center; gap: 6px;
+}
+.mode-tab:hover { color: var(--text); }
+.mode-tab.active[data-mode="dingtalk"] { color: var(--mode-dingtalk); border-bottom-color: var(--mode-dingtalk); }
+.mode-tab.active[data-mode="meeting"] { color: var(--mode-meeting); border-bottom-color: var(--mode-meeting); }
+.mode-tab.active[data-mode="letter"] { color: var(--mode-letter); border-bottom-color: var(--mode-letter); }
+.mode-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+}
+.dot-dingtalk { background: var(--mode-dingtalk); }
+.dot-meeting { background: var(--mode-meeting); }
+.dot-letter { background: var(--mode-letter); }
 
-  body {
-    font-family: 'Noto Sans KR', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-    font-size: 14px;
-    line-height: 1.6;
-  }
+main { max-width: 860px; margin: 0 auto; padding: 28px 20px 80px; }
 
-  header {
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
-    padding: 20px 32px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-  }
+/* RECIPIENT ROW - only for dingtalk */
+.recipient-row {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 16px;
+  padding: 12px 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+.recipient-label { font-size: 12px; color: var(--muted); white-space: nowrap; }
+.recipient-btns { display: flex; gap: 6px; flex-wrap: wrap; }
+.recipient-btn {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 12px; padding: 5px 14px;
+  border: 1px solid var(--border); border-radius: 20px;
+  background: transparent; color: var(--muted);
+  cursor: pointer; transition: all 0.15s;
+}
+.recipient-btn:hover { border-color: var(--accent-muted); color: var(--accent); }
+.recipient-btn.active { background: var(--accent); color: white; border-color: var(--accent); }
+.recipient-hint {
+  margin-left: auto; font-size: 11px; color: var(--muted);
+  font-style: italic; white-space: nowrap;
+}
 
-  .logo {
-    display: flex;
-    align-items: baseline;
-    gap: 10px;
-  }
+.input-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: var(--shadow);
+  margin-bottom: 20px;
+}
+.input-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.section-label { font-size: 11px; font-weight: 500; color: var(--muted); letter-spacing: 0.8px; text-transform: uppercase; }
+.lang-badge { font-size: 11px; padding: 3px 10px; border-radius: 20px; background: var(--tag-bg); color: var(--muted); }
+.lang-badge.detected { background: var(--accent-light); color: var(--accent); }
+textarea {
+  width: 100%; font-family: 'Noto Sans KR', sans-serif;
+  font-size: 14px; line-height: 1.7; border: none; outline: none;
+  resize: vertical; min-height: 150px; background: transparent; color: var(--text);
+}
+textarea::placeholder { color: var(--muted); font-size: 13px; }
+.options-row {
+  display: flex; align-items: center; gap: 12px;
+  margin-top: 14px; padding-top: 14px;
+  border-top: 1px solid var(--border); flex-wrap: wrap;
+}
+.option-label { font-size: 12px; color: var(--muted); }
+.tone-btns { display: flex; gap: 6px; }
+.tone-btn {
+  font-family: 'Noto Sans KR', sans-serif; font-size: 12px;
+  padding: 4px 12px; border: 1px solid var(--border); border-radius: 20px;
+  background: transparent; color: var(--muted); cursor: pointer; transition: all 0.15s;
+}
+.tone-btn:hover { border-color: var(--accent-muted); color: var(--accent); }
+.tone-btn.active { background: var(--accent); color: white; border-color: var(--accent); }
+.analyze-btn {
+  margin-left: auto; font-family: 'Noto Sans KR', sans-serif;
+  font-size: 13px; font-weight: 500; padding: 9px 24px;
+  background: var(--accent); color: white; border: none;
+  border-radius: 8px; cursor: pointer; letter-spacing: 0.2px;
+  transition: opacity 0.15s, transform 0.1s;
+  display: flex; align-items: center; gap: 6px;
+}
+.analyze-btn:hover { opacity: 0.88; }
+.analyze-btn:active { transform: scale(0.98); }
+.analyze-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.spinner { width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.7s linear infinite; display: none; }
+@keyframes spin { to { transform: rotate(360deg); } }
 
-  .logo-main {
-    font-family: 'Noto Serif KR', serif;
-    font-size: 18px;
-    font-weight: 600;
-    color: var(--accent);
-    letter-spacing: -0.3px;
-  }
+.error-msg { display: none; background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 10px 14px; color: #dc2626; font-size: 13px; margin-bottom: 16px; }
+.loading-bar { display: none; height: 2px; background: linear-gradient(90deg, var(--accent), var(--accent-muted), var(--accent)); background-size: 200% 100%; animation: shimmer 1.2s linear infinite; border-radius: 2px; margin-bottom: 16px; }
+@keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
 
-  .logo-sub {
-    font-size: 12px;
-    color: var(--muted);
-    letter-spacing: 0.5px;
-  }
+/* RESULTS */
+.results-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 24px; }
+@media (max-width: 640px) { .results-grid { grid-template-columns: 1fr; } header { padding: 12px 16px; flex-direction: column; align-items: flex-start; gap: 8px; } .mode-tabs { padding: 0 16px; } }
+.result-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 12px; padding: 18px; box-shadow: var(--shadow);
+  display: flex; flex-direction: column; gap: 10px;
+  opacity: 0; transform: translateY(8px);
+  transition: opacity 0.35s ease, transform 0.35s ease;
+}
+.result-card.show { opacity: 1; transform: translateY(0); }
+.result-card.full-width { grid-column: 1 / -1; }
+.result-header { display: flex; align-items: center; justify-content: space-between; }
+.result-type { display: flex; align-items: center; gap: 7px; }
+.type-icon {
+  width: 28px; height: 28px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center; font-size: 15px;
+  flex-shrink: 0;
+}
+.icon-summary { background: #e8f4fd; }
+.icon-translate { background: #e8f0ea; }
+.icon-report { background: #fef3e2; }
+.icon-action { background: #fce8e8; }
+.icon-oneline { background: #ede8fc; }
+.icon-minutes { background: #e8f0f4; }
+.icon-issue { background: #fce8f0; }
+.result-title { font-size: 13px; font-weight: 500; color: var(--text); }
+.result-subtitle { font-size: 11px; color: var(--muted); margin-top: 1px; }
+.copy-btn {
+  font-size: 11px; padding: 4px 10px;
+  border: 1px solid var(--border); border-radius: 6px;
+  background: var(--bg); color: var(--muted); cursor: pointer;
+  transition: all 0.15s; flex-shrink: 0;
+}
+.copy-btn:hover { border-color: var(--accent-muted); color: var(--accent); }
+.copy-btn.copied { background: var(--accent-light); color: var(--accent); border-color: var(--accent-muted); }
+.result-body {
+  font-size: 13px; line-height: 1.8; color: var(--text);
+  white-space: pre-wrap; word-break: break-word;
+  flex: 1; min-height: 80px;
+}
+.result-body.placeholder { color: var(--muted); font-style: italic; }
 
-  .api-row {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .api-row label {
-    font-size: 11px;
-    color: var(--muted);
-    letter-spacing: 0.3px;
-    white-space: nowrap;
-  }
-
-  .api-input {
-    font-family: 'Noto Sans KR', sans-serif;
-    font-size: 12px;
-    padding: 6px 12px;
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    background: var(--bg);
-    color: var(--text);
-    width: 220px;
-    outline: none;
-    transition: border-color 0.2s;
-  }
-
-  .api-input:focus {
-    border-color: var(--accent-muted);
-  }
-
-  .api-status {
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    background: #ddd;
-    flex-shrink: 0;
-    transition: background 0.3s;
-  }
-
-  .api-status.ok { background: #4caf50; }
-  .api-status.err { background: #e57373; }
-
-  main {
-    max-width: 820px;
-    margin: 0 auto;
-    padding: 32px 20px 80px;
-  }
-
-  .section-label {
-    font-size: 11px;
-    font-weight: 500;
-    color: var(--muted);
-    letter-spacing: 0.8px;
-    text-transform: uppercase;
-    margin-bottom: 10px;
-  }
-
-  .input-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 20px;
-    box-shadow: var(--shadow);
-    margin-bottom: 20px;
-  }
-
-  .input-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 12px;
-  }
-
-  .lang-badge {
-    font-size: 11px;
-    padding: 3px 10px;
-    border-radius: 20px;
-    background: var(--tag-bg);
-    color: var(--muted);
-    letter-spacing: 0.3px;
-  }
-
-  .lang-badge.detected {
-    background: var(--accent-light);
-    color: var(--accent);
-  }
-
-  textarea {
-    width: 100%;
-    font-family: 'Noto Sans KR', sans-serif;
-    font-size: 14px;
-    line-height: 1.7;
-    border: none;
-    outline: none;
-    resize: vertical;
-    min-height: 160px;
-    background: transparent;
-    color: var(--text);
-    placeholder-color: var(--muted);
-  }
-
-  textarea::placeholder {
-    color: var(--muted);
-    font-size: 13px;
-  }
-
-  .options-row {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-top: 14px;
-    padding-top: 14px;
-    border-top: 1px solid var(--border);
-    flex-wrap: wrap;
-  }
-
-  .option-label {
-    font-size: 12px;
-    color: var(--muted);
-  }
-
-  .tone-btns {
-    display: flex;
-    gap: 6px;
-  }
-
-  .tone-btn {
-    font-family: 'Noto Sans KR', sans-serif;
-    font-size: 12px;
-    padding: 4px 12px;
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    background: transparent;
-    color: var(--muted);
-    cursor: pointer;
-    transition: all 0.15s;
-  }
-
-  .tone-btn:hover { border-color: var(--accent-muted); color: var(--accent); }
-  .tone-btn.active { background: var(--accent); color: white; border-color: var(--accent); }
-
-  .analyze-btn {
-    margin-left: auto;
-    font-family: 'Noto Sans KR', sans-serif;
-    font-size: 13px;
-    font-weight: 500;
-    padding: 9px 24px;
-    background: var(--accent);
-    color: white;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    letter-spacing: 0.2px;
-    transition: opacity 0.15s, transform 0.1s;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-
-  .analyze-btn:hover { opacity: 0.88; }
-  .analyze-btn:active { transform: scale(0.98); }
-  .analyze-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-
-  .spinner {
-    width: 14px;
-    height: 14px;
-    border: 2px solid rgba(255,255,255,0.3);
-    border-top-color: white;
-    border-radius: 50%;
-    animation: spin 0.7s linear infinite;
-    display: none;
-  }
-
-  @keyframes spin { to { transform: rotate(360deg); } }
-
-  .results-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 14px;
-    margin-top: 24px;
-  }
-
-  @media (max-width: 600px) {
-    .results-grid { grid-template-columns: 1fr; }
-    header { padding: 14px 16px; flex-direction: column; align-items: flex-start; gap: 10px; }
-    .api-input { width: 180px; }
-  }
-
-  .result-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 18px;
-    box-shadow: var(--shadow);
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    opacity: 0;
-    transform: translateY(8px);
-    transition: opacity 0.35s ease, transform 0.35s ease;
-  }
-
-  .result-card.show {
-    opacity: 1;
-    transform: translateY(0);
-  }
-
-  .result-card.full-width {
-    grid-column: 1 / -1;
-  }
-
-  .result-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-
-  .result-type {
-    display: flex;
-    align-items: center;
-    gap: 7px;
-  }
-
-  .type-icon {
-    width: 26px;
-    height: 26px;
-    border-radius: 7px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 13px;
-  }
-
-  .icon-summary { background: #e8f0ea; }
-  .icon-translate { background: #e8eef8; }
-  .icon-report { background: #fdf0e8; }
-  .icon-oneline { background: #f0e8f8; }
-
-  .result-title {
-    font-size: 12px;
-    font-weight: 500;
-    color: var(--text);
-    letter-spacing: 0.2px;
-  }
-
-  .result-subtitle {
-    font-size: 11px;
-    color: var(--muted);
-  }
-
-  .copy-btn {
-    font-family: 'Noto Sans KR', sans-serif;
-    font-size: 11px;
-    padding: 4px 10px;
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    background: transparent;
-    color: var(--muted);
-    cursor: pointer;
-    transition: all 0.15s;
-    white-space: nowrap;
-  }
-
-  .copy-btn:hover { border-color: var(--accent-muted); color: var(--accent); background: var(--accent-light); }
-  .copy-btn.copied { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
-
-  .result-body {
-    font-size: 13px;
-    line-height: 1.75;
-    color: var(--text);
-    white-space: pre-wrap;
-    word-break: break-word;
-    min-height: 40px;
-    padding: 10px 12px;
-    background: var(--bg);
-    border-radius: 8px;
-    flex: 1;
-  }
-
-  .result-body.placeholder {
-    color: var(--muted);
-    font-style: italic;
-  }
-
-  .loading-bar {
-    height: 2px;
-    background: linear-gradient(90deg, var(--accent-light), var(--accent), var(--accent-light));
-    background-size: 200% 100%;
-    border-radius: 2px;
-    animation: shimmer 1.2s infinite;
-    display: none;
-    margin: 4px 0;
-  }
-
-  @keyframes shimmer {
-    0% { background-position: 200% 0; }
-    100% { background-position: -200% 0; }
-  }
-
-  .error-msg {
-    font-size: 12px;
-    color: #c0392b;
-    padding: 10px 14px;
-    background: #fdf0ef;
-    border-radius: 8px;
-    border: 1px solid #f5c6c2;
-    margin-top: 12px;
-    display: none;
-  }
-
-  .divider {
-    height: 1px;
-    background: var(--border);
-    margin: 6px 0;
-  }
-
-  .action-tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 5px;
-    margin-top: 4px;
-  }
-
-  .action-tag {
-    font-size: 11px;
-    padding: 3px 9px;
-    background: var(--tag-bg);
-    border-radius: 20px;
-    color: var(--muted);
-  }
+/* MEETING MODE specific label */
+.meeting-hint {
+  background: #eef2f8; border: 1px solid #d0d8e8;
+  border-radius: 8px; padding: 10px 14px;
+  font-size: 12px; color: #4a5578; line-height: 1.6;
+  margin-bottom: 16px; display: none;
+}
+.meeting-hint.show { display: block; }
 </style>
 </head>
 <body>
@@ -399,34 +222,61 @@
 <header>
   <div class="logo">
     <span class="logo-main">Work Briefing</span>
-    <span class="logo-sub">딩톡 분석기</span>
+    <span class="logo-sub">상희 전용 v2</span>
   </div>
   <div class="api-row">
     <label>API KEY</label>
-    <input class="api-input" type="password" id="apiKey" placeholder="sk-ant-api03-..." autocomplete="off">
+    <input type="password" class="api-input" id="apiKey" placeholder="sk-ant-...">
     <div class="api-status" id="apiStatus"></div>
   </div>
 </header>
 
+<div class="mode-tabs">
+  <button class="mode-tab active" data-mode="dingtalk" onclick="switchMode('dingtalk')">
+    <span class="mode-dot dot-dingtalk"></span> 딩톡 · 메신저
+  </button>
+  <button class="mode-tab" data-mode="meeting" onclick="switchMode('meeting')">
+    <span class="mode-dot dot-meeting"></span> 회의록
+  </button>
+  <button class="mode-tab" data-mode="letter" onclick="switchMode('letter')">
+    <span class="mode-dot dot-letter"></span> 공문 · 이메일
+  </button>
+</div>
+
 <main>
+  <!-- RECIPIENT ROW (dingtalk only) -->
+  <div class="recipient-row" id="recipientRow">
+    <span class="recipient-label">수신자</span>
+    <div class="recipient-btns">
+      <button class="recipient-btn active" data-r="guangming">광밍 (Albert)</button>
+      <button class="recipient-btn" data-r="songyi">송이님</button>
+      <button class="recipient-btn" data-r="dept">유관부서</button>
+      <button class="recipient-btn" data-r="cardco">카드사</button>
+    </div>
+    <span class="recipient-hint" id="recipientHint">HQ 크로스보더 BD · 구어체 · 숫자/데이터 중시</span>
+  </div>
+
+  <!-- MEETING HINT -->
+  <div class="meeting-hint" id="meetingHint">
+    📋 会议纪要 모드 — 语雀/飞书 스타일로 출력됩니다. 【】 구조 · 파이프 테이블 · 서면 간결체
+  </div>
+
   <div class="input-card">
     <div class="input-header">
-      <div class="section-label">대화 내용 붙여넣기</div>
+      <div class="section-label" id="inputLabel">대화 내용 붙여넣기</div>
       <span class="lang-badge" id="langBadge">언어 자동 감지</span>
     </div>
-    <textarea id="inputText"
-      placeholder="딩톡, 위챗, 이메일 등 업무 대화 내용을 붙여넣으세요.&#10;한국어 / 中文 모두 가능합니다."></textarea>
-
+    <textarea id="inputText" placeholder="딩톡/위챗 대화 내용을 붙여넣으세요. 한국어·中文 모두 가능합니다."></textarea>
     <div class="options-row">
-      <span class="option-label">보고 톤</span>
-      <div class="tone-btns">
+      <span class="option-label">톤</span>
+      <div class="tone-btns" id="toneBtns">
         <button class="tone-btn active" data-tone="formal">공식</button>
         <button class="tone-btn" data-tone="friendly">친근</button>
         <button class="tone-btn" data-tone="urgent">긴급</button>
       </div>
       <button class="analyze-btn" id="analyzeBtn" onclick="analyze()">
         <div class="spinner" id="spinner"></div>
-        분석하기
+        <span id="analyzeBtnText">분석하기</span>
       </button>
     </div>
   </div>
@@ -434,83 +284,219 @@
   <div class="error-msg" id="errorMsg"></div>
   <div class="loading-bar" id="loadingBar"></div>
 
-  <div class="results-grid" id="resultsGrid">
+  <!-- DINGTALK RESULTS -->
+  <div class="results-grid" id="resultsDingtalk">
     <div class="result-card" id="card-summary">
       <div class="result-header">
-        <div class="result-type">
-          <div class="type-icon icon-summary">📋</div>
-          <div>
-            <div class="result-title">상황 요약</div>
-            <div class="result-subtitle">핵심 파악 3줄</div>
-          </div>
+        <div class="result-type"><div class="type-icon icon-summary">📋</div>
+          <div><div class="result-title">상황 요약</div><div class="result-subtitle">핵심 3줄</div></div>
         </div>
         <button class="copy-btn" onclick="copyResult('summary')">복사</button>
       </div>
       <div class="result-body placeholder" id="body-summary">분석 결과가 여기에 표시됩니다</div>
     </div>
-
     <div class="result-card" id="card-translate">
       <div class="result-header">
-        <div class="result-type">
-          <div class="type-icon icon-translate">🔄</div>
-          <div>
-            <div class="result-title">번역본</div>
-            <div class="result-subtitle" id="translate-subtitle">한 ↔ 중 번역</div>
-          </div>
+        <div class="result-type"><div class="type-icon icon-translate">🔄</div>
+          <div><div class="result-title">번역본</div><div class="result-subtitle" id="translate-subtitle">한 ↔ 중 번역</div></div>
         </div>
         <button class="copy-btn" onclick="copyResult('translate')">복사</button>
       </div>
       <div class="result-body placeholder" id="body-translate">분석 결과가 여기에 표시됩니다</div>
     </div>
-
     <div class="result-card" id="card-report">
       <div class="result-header">
-        <div class="result-type">
-          <div class="type-icon icon-report">📨</div>
-          <div>
-            <div class="result-title">딩톡 보고 메시지</div>
-            <div class="result-subtitle">상사용 중문 보고</div>
-          </div>
+        <div class="result-type"><div class="type-icon icon-report">📨</div>
+          <div><div class="result-title">딩톡 답장 초안</div><div class="result-subtitle" id="report-subtitle">수신자 맞춤 메시지</div></div>
         </div>
         <button class="copy-btn" onclick="copyResult('report')">복사</button>
       </div>
       <div class="result-body placeholder" id="body-report">분석 결과가 여기에 표시됩니다</div>
     </div>
-
     <div class="result-card" id="card-action">
       <div class="result-header">
-        <div class="result-type">
-          <div class="type-icon icon-oneline">⚡</div>
-          <div>
-            <div class="result-title">액션 아이템</div>
-            <div class="result-subtitle">우선순위 할 일</div>
-          </div>
+        <div class="result-type"><div class="type-icon icon-action">⚡</div>
+          <div><div class="result-title">액션 아이템</div><div class="result-subtitle">우선순위 할 일</div></div>
         </div>
         <button class="copy-btn" onclick="copyResult('action')">복사</button>
       </div>
       <div class="result-body placeholder" id="body-action">분석 결과가 여기에 표시됩니다</div>
     </div>
-
     <div class="result-card full-width" id="card-oneline">
       <div class="result-header">
-        <div class="result-type">
-          <div class="type-icon icon-oneline">📢</div>
-          <div>
-            <div class="result-title">유관부서 공유용 한 줄 요약</div>
-            <div class="result-subtitle">한국어 · 내부 공유용</div>
-          </div>
+        <div class="result-type"><div class="type-icon icon-oneline">📢</div>
+          <div><div class="result-title">유관부서 공유용 한 줄 요약</div><div class="result-subtitle">한국어 · 내부 공유용</div></div>
         </div>
         <button class="copy-btn" onclick="copyResult('oneline')">복사</button>
       </div>
       <div class="result-body placeholder" id="body-oneline">분석 결과가 여기에 표시됩니다</div>
     </div>
   </div>
+
+  <!-- MEETING RESULTS -->
+  <div class="results-grid" id="resultsMeeting" style="display:none">
+    <div class="result-card full-width" id="card-minutes">
+      <div class="result-header">
+        <div class="result-type"><div class="type-icon icon-minutes">📝</div>
+          <div><div class="result-title">会议纪要 (语雀 스타일)</div><div class="result-subtitle">중국어 서면 간결체 · 【】구조</div></div>
+        </div>
+        <button class="copy-btn" onclick="copyResult('minutes')">복사</button>
+      </div>
+      <div class="result-body placeholder" id="body-minutes">분석 결과가 여기에 표시됩니다</div>
+    </div>
+    <div class="result-card" id="card-minutes-ko">
+      <div class="result-header">
+        <div class="result-type"><div class="type-icon icon-translate">🇰🇷</div>
+          <div><div class="result-title">한국어 요약본</div><div class="result-subtitle">Songyi님 보고용</div></div>
+        </div>
+        <button class="copy-btn" onclick="copyResult('minutes-ko')">복사</button>
+      </div>
+      <div class="result-body placeholder" id="body-minutes-ko">분석 결과가 여기에 표시됩니다</div>
+    </div>
+    <div class="result-card" id="card-issue">
+      <div class="result-header">
+        <div class="result-type"><div class="type-icon icon-issue">🚨</div>
+          <div><div class="result-title">리스크 · 이슈</div><div class="result-subtitle">내가 판단해야 할 것</div></div>
+        </div>
+        <button class="copy-btn" onclick="copyResult('issue')">복사</button>
+      </div>
+      <div class="result-body placeholder" id="body-issue">분석 결과가 여기에 표시됩니다</div>
+    </div>
+  </div>
+
+  <!-- LETTER RESULTS -->
+  <div class="results-grid" id="resultsLetter" style="display:none">
+    <div class="result-card full-width" id="card-letter-ko">
+      <div class="result-header">
+        <div class="result-type"><div class="type-icon icon-report">📄</div>
+          <div><div class="result-title">한국어 공문 초안</div><div class="result-subtitle">카드사 발송용</div></div>
+        </div>
+        <button class="copy-btn" onclick="copyResult('letter-ko')">복사</button>
+      </div>
+      <div class="result-body placeholder" id="body-letter-ko">분석 결과가 여기에 표시됩니다</div>
+    </div>
+    <div class="result-card full-width" id="card-letter-zh">
+      <div class="result-header">
+        <div class="result-type"><div class="type-icon icon-translate">🇨🇳</div>
+          <div><div class="result-title">중국어 공문 초안</div><div class="result-subtitle">HQ 보고용 · 飞书 스타일</div></div>
+        </div>
+        <button class="copy-btn" onclick="copyResult('letter-zh')">복사</button>
+      </div>
+      <div class="result-body placeholder" id="body-letter-zh">분석 결과가 여기에 표시됩니다</div>
+    </div>
+    <div class="result-card full-width" id="card-letter-point">
+      <div class="result-header">
+        <div class="result-type"><div class="type-icon icon-action">🎯</div>
+          <div><div class="result-title">협상 포인트 · 주의사항</div><div class="result-subtitle">발송 전 체크리스트</div></div>
+        </div>
+        <button class="copy-btn" onclick="copyResult('letter-point')">복사</button>
+      </div>
+      <div class="result-body placeholder" id="body-letter-point">분석 결과가 여기에 표시됩니다</div>
+    </div>
+  </div>
 </main>
 
 <script>
+// ── STATE ──────────────────────────────────────────────
+let currentMode = 'dingtalk';
 let selectedTone = 'formal';
-let results = { summary: '', translate: '', report: '', action: '', oneline: '' };
+let selectedRecipient = 'guangming';
+let results = {};
 
+// ── RECIPIENT PROFILES ─────────────────────────────────
+const recipientProfiles = {
+  guangming: {
+    label: 'HQ 크로스보더 BD · 구어체 · 숫자/데이터 중시',
+    hint: '광밍(郑光明): 알리바바 11년 시니어. 데이터·GMV 중심. 직접적이고 효율적인 커뮤니케이션 선호. 감정보다 실적. CB/LC 균형 전략에 관심. 상희와 협력 관계.',
+    tone_guide: '구어체 중국어. 数据说话 스타일. 불필요한 격식 없이 핵심만. 상호 이익 프레이밍.'
+  },
+  songyi: {
+    label: 'Songyi님 · 내부 보고 · 한국어',
+    hint: '송이님: 상희 직속 매니저. 週간 보고 형식 선호(현황→리스크→결정사항). 영향자 스타일 포맷팅 선호. 외부 탓보다 내가 한 것 중심 서술.',
+    tone_guide: '한국어. 인플루언서 보고 스타일. 핵심상황 → 리스크/이슈 테이블 → 결정 필요 항목 구조. 簡潔하게.'
+  },
+  dept: {
+    label: '유관부서 · 한국어 · 정보 공유용',
+    hint: '유관부서(마케팅/운영/재무): 배경지식 없는 청중. 카드사 이름·프로모션 조건 중심. 협조 요청 시 명확한 데드라인과 요청사항.',
+    tone_guide: '한국어. 배경 설명 포함. 요청사항 명확히. 카드사별 캠페인 조건 구체적으로.'
+  },
+  cardco: {
+    label: '카드사 담당자 · 공식 · 한국어',
+    hint: '카드사(KB/롯데/신한/하나/우리/BC/삼성): 공식 비즈니스 톤. 혜택 조건·예산·기간 명확히. 상호 이익 강조. AliExpress 해외거래 1위 포지셔닝 활용.',
+    tone_guide: '공식 한국어. 혜택 수치 구체적으로. AliExpress 플랫폼 강점(해외결제 1위) 자연스럽게 녹이기.'
+  }
+};
+
+// ── ALIEXPRESS / CARD TERMS ────────────────────────────
+const CONTEXT_TERMS = `
+[알리익스프레스 코리아 전용 용어]
+- GMV: 거래액 (Gross Merchandise Value)
+- CB: 크로스보더 (Cross-border, 해외직구 상품)
+- LC/Local: 로컬 상품 (국내 판매자)
+- 즉시할인: 결제 시점 바로 할인 적용 (AliExpress 지원 방식)
+- 청구할인: 카드사가 사후 청구서에서 할인 (삼성카드 요구 방식, AX 시스템 미지원)
+- BIN: 카드번호 앞 6~8자리, 카드사/종류 식별
+- 정산: 카드사와의 프로모션 비용 정산
+- 자손(自損): 내부 손실 처리
+- S급/S-grade 행사: 최상위 프로모션 이벤트 (618, Double11, Black Friday 등)
+- 圈品: 로컬 전용 큐레이션 상품 (CB 거래 거의 없음)
+- 결제 레시피: 카드할인 임계값 달성을 위한 상품 조합 가이드
+- BJ2: AliExpress Korea 법인
+- BO3: Alibaba 본사 법인
+- 飞书/Feishu: 사내 협업툴 (=Lark)
+- 语雀: 알리바바 문서 협업 플랫폼
+- 钉钉/DingTalk: 사내 메신저
+- AIDC: AliExpress International Digital Commerce
+- KakaoPay/NaverPay/TossPay: 간편결제사 (확장 도메인)
+- 디딤돌대출: 생애최초 주택담보대출
+[카드사 담당자 정보]
+- KB카드: 일반 (법인카드 BIN 이슈 해결 완료)
+- 롯데카드: S급/Brand Day/Payday 공문 협의 중
+- 신한카드: 정승돈 팀장, 김남선 프로 (안영신 프로 인수인계)
+- 하나카드: 로컬 즉시할인 합류 완료 (6/3~)
+- 삼성카드: 청구할인 구조 이슈로 Q2 중단, Aug/Nov 재협의
+- UPI: Sungjin 담당, 연간 인센티브 협의 중
+`;
+
+// ── MODE SWITCH ────────────────────────────────────────
+function switchMode(mode) {
+  currentMode = mode;
+  document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('active'));
+  document.querySelector(`.mode-tab[data-mode="${mode}"]`).classList.add('active');
+
+  document.getElementById('recipientRow').style.display = mode === 'dingtalk' ? 'flex' : 'none';
+  document.getElementById('meetingHint').classList.toggle('show', mode === 'meeting');
+  document.getElementById('resultsDingtalk').style.display = mode === 'dingtalk' ? 'grid' : 'none';
+  document.getElementById('resultsMeeting').style.display = mode === 'meeting' ? 'grid' : 'none';
+  document.getElementById('resultsLetter').style.display = mode === 'letter' ? 'grid' : 'none';
+
+  const placeholders = {
+    dingtalk: '딩톡/위챗 대화 내용을 붙여넣으세요.\n한국어·中文 모두 가능합니다.',
+    meeting: '회의록 텍스트를 붙여넣으세요.\n중국어·한국어 모두 가능합니다.\n(참석자, 날짜 포함하면 더 정확합니다)',
+    letter: '공문/이메일 초안 또는 요청 내용을 붙여넣으세요.\n카드사명, 혜택 조건, 기간을 포함해주세요.'
+  };
+  const labels = { dingtalk: '대화 내용 붙여넣기', meeting: '회의록 원문 붙여넣기', letter: '공문 요청 내용' };
+  const btnTexts = { dingtalk: '분석하기', meeting: '회의록 변환', letter: '공문 초안 생성' };
+
+  document.getElementById('inputText').placeholder = placeholders[mode];
+  document.getElementById('inputLabel').textContent = labels[mode];
+  document.getElementById('analyzeBtnText').textContent = btnTexts[mode];
+
+  clearAllResults();
+}
+
+// ── RECIPIENT ──────────────────────────────────────────
+document.querySelectorAll('.recipient-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.recipient-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    selectedRecipient = btn.dataset.r;
+    document.getElementById('recipientHint').textContent = recipientProfiles[selectedRecipient].label;
+    document.getElementById('report-subtitle').textContent = `${btn.textContent} 맞춤 메시지`;
+  });
+});
+
+// ── TONE ───────────────────────────────────────────────
 document.querySelectorAll('.tone-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     document.querySelectorAll('.tone-btn').forEach(b => b.classList.remove('active'));
@@ -519,75 +505,118 @@ document.querySelectorAll('.tone-btn').forEach(btn => {
   });
 });
 
+// ── LANG DETECT ───────────────────────────────────────
 const textarea = document.getElementById('inputText');
 textarea.addEventListener('input', detectLang);
-
 function detectLang() {
   const text = textarea.value;
   const badge = document.getElementById('langBadge');
-  const chinese = (text.match(/[\u4e00-\u9fff]/g) || []).length;
-  const korean = (text.match(/[\uac00-\ud7af]/g) || []).length;
-  if (chinese > korean && chinese > 2) {
-    badge.textContent = '중문 감지됨 · 中文';
-    badge.className = 'lang-badge detected';
-    document.getElementById('translate-subtitle').textContent = '중→한 번역';
-  } else if (korean > chinese && korean > 2) {
-    badge.textContent = '한국어 감지됨';
-    badge.className = 'lang-badge detected';
-    document.getElementById('translate-subtitle').textContent = '한→중 번역';
-  } else {
-    badge.textContent = '언어 자동 감지';
-    badge.className = 'lang-badge';
-  }
+  const zh = (text.match(/[\u4e00-\u9fff]/g) || []).length;
+  const ko = (text.match(/[\uac00-\ud7af]/g) || []).length;
+  if (zh > ko && zh > 2) { badge.textContent = '중문 감지됨 · 中文'; badge.className = 'lang-badge detected'; document.getElementById('translate-subtitle').textContent = '중→한 번역'; }
+  else if (ko > zh && ko > 2) { badge.textContent = '한국어 감지됨'; badge.className = 'lang-badge detected'; document.getElementById('translate-subtitle').textContent = '한→중 번역'; }
+  else { badge.textContent = '언어 자동 감지'; badge.className = 'lang-badge'; }
 }
 
+// ── API KEY ────────────────────────────────────────────
 const apiKeyInput = document.getElementById('apiKey');
-const savedKey = sessionStorage.getItem('wb_api_key');
+const savedKey = localStorage.getItem('wb_api_key_v2');
 if (savedKey) apiKeyInput.value = savedKey;
-
 apiKeyInput.addEventListener('input', () => {
-  sessionStorage.setItem('wb_api_key', apiKeyInput.value);
+  localStorage.setItem('wb_api_key_v2', apiKeyInput.value);
   document.getElementById('apiStatus').className = 'api-status';
 });
 
-async function analyze() {
-  const apiKey = apiKeyInput.value.trim();
-  const inputText = textarea.value.trim();
-
-  if (!apiKey) {
-    showError('API 키를 입력해주세요.');
-    return;
-  }
-  if (!inputText) {
-    showError('분석할 대화 내용을 붙여넣어주세요.');
-    return;
-  }
-
+// ── BUILD PROMPTS ──────────────────────────────────────
+function buildPrompt() {
+  const input = textarea.value.trim();
   const toneMap = { formal: '공식적이고 정중한', friendly: '친근하고 자연스러운', urgent: '긴급하고 간결한' };
   const toneKor = toneMap[selectedTone];
 
-  setLoading(true);
-  clearResults();
+  if (currentMode === 'dingtalk') {
+    const rp = recipientProfiles[selectedRecipient];
+    const system = `You are Sophie's (김상희/샹시) personal bilingual assistant at AliExpress Korea (AIDC Payment Marketing team).
+Sophie is a Senior Payment Specialist managing Korean card company partnerships (KB, Lotte, Hana, Shinhan, Woori, BC, Samsung) and cross-border/local payment promotions.
+You know all AliExpress internal terms, card company contexts, and Sophie's key colleagues.
+Respond ONLY with valid JSON — no markdown, no preamble.
 
-  const systemPrompt = `You are a bilingual Korean-Chinese business analyst assistant for a Korean e-commerce professional working in payment partnerships. 
-The user will paste business chat messages (DingTalk/WeChat/email) in Korean or Chinese.
-You must respond ONLY with a valid JSON object — no markdown, no preamble.`;
+${CONTEXT_TERMS}
 
-  const userPrompt = `Analyze this business conversation and return ONLY a JSON object with these exact keys:
+RECIPIENT PROFILE: ${rp.hint}
+TONE GUIDE: ${rp.tone_guide}`;
 
+    const user = `Analyze this business conversation and return ONLY a JSON object:
 {
-  "detected_lang": "ko" or "zh",
-  "summary": "3-line bullet point summary of the situation (use the same language as input)",
-  "translate": "Full translation to the OTHER language (Korean→Chinese or Chinese→Korean). Natural, professional tone.",
-  "report": "A DingTalk-style report message in Chinese (中文) for reporting to a superior. Tone: ${toneKor}. Format it like a real DingTalk message with appropriate greeting.",
-  "action": "Priority action items as numbered list in Korean. 3-5 items max.",
-  "oneline": "One concise sentence summary in Korean for sharing with internal teams (유관부서 공유용)"
+  "summary": "핵심 상황 3줄 요약 (입력 언어와 동일하게)",
+  "translate": "전체 번역본 (한→중 또는 중→한, 자연스러운 비즈니스 톤)",
+  "report": "수신자(${selectedRecipient}) 맞춤 딩톡 답장 초안. 톤: ${toneKor}. 실제 딩톡 메시지처럼 작성. 수신자 프로필에 맞는 언어와 스타일 사용.",
+  "action": "우선순위 액션 아이템 3-5개, 한국어 번호 목록",
+  "oneline": "유관부서 공유용 한 줄 요약, 한국어"
 }
 
-Business conversation to analyze:
+대화 내용:
 ---
-${inputText}
+${input}
 ---`;
+    return { system, user };
+  }
+
+  if (currentMode === 'meeting') {
+    const system = `You are Sophie's personal assistant specializing in Chinese business document formatting.
+Sophie works at AliExpress Korea and needs meeting minutes in 语雀/飞书 style.
+Output format rules: use 【】for section headers, pipe-character tables, plain text only (no markdown), concise business Chinese (书面语).
+Respond ONLY with valid JSON — no markdown, no preamble.
+
+${CONTEXT_TERMS}`;
+
+    const user = `Convert this meeting content into structured documents. Return ONLY a JSON object:
+{
+  "minutes": "语雀 스타일 회议纪要 (중국어 서면어). 구조: 【会议信息】날짜/참석자 | 【议题概述】| 【讨论要点】파이프 테이블 | 【决议事项】| 【待办事项】책임자|내용|기한 테이블. 【】헤더, 파이프 테이블 사용, 마크다운 없음.",
+  "minutes_ko": "한국어 요약본. Songyi님 보고용. 형식: 핵심상황 → 결정사항 → 리스크/이슈 → 내 액션아이템. 간결하게.",
+  "issue": "리스크·이슈 항목. 한국어. '내가 판단해야 할 것'과 '즉시 조치 필요'로 구분해서 정리."
+}
+
+회의 내용:
+---
+${input}
+---`;
+    return { system, user };
+  }
+
+  if (currentMode === 'letter') {
+    const system = `You are Sophie's personal assistant for drafting formal business letters at AliExpress Korea.
+Sophie manages Korean card company partnerships. You draft both Korean formal letters and Chinese HQ-style documents.
+Korean letters: formal 공문 style. Chinese docs: 飞书 plain text style with 【】headers.
+Respond ONLY with valid JSON — no markdown, no preamble.
+
+${CONTEXT_TERMS}`;
+
+    const user = `Draft business communication documents based on this request. Return ONLY a JSON object:
+{
+  "letter_ko": "한국어 공문 초안. 수신: 카드사 담당자. 정중하고 공식적인 공문 형식. 혜택 조건·기간·예산 명확히. AliExpress 해외결제 1위 포지셔닝 자연스럽게 포함.",
+  "letter_zh": "중국어 HQ 보고용 문서. 飞书 스타일: 【배경】【요청사항】【기대효과】【예산】구조. 서면 간결체. 마크다운 없음.",
+  "letter_point": "협상 포인트 및 발송 전 체크리스트. 한국어. 카드사 성향 고려사항, 놓치기 쉬운 조건, 예상 반응 및 대응 포인트 포함."
+}
+
+요청 내용:
+---
+${input}
+---`;
+    return { system, user };
+  }
+}
+
+// ── ANALYZE ────────────────────────────────────────────
+async function analyze() {
+  const apiKey = apiKeyInput.value.trim();
+  const inputText = textarea.value.trim();
+  if (!apiKey) { showError('API 키를 입력해주세요.'); return; }
+  if (!inputText) { showError('내용을 붙여넣어주세요.'); return; }
+
+  setLoading(true);
+  clearAllResults();
+
+  const { system, user } = buildPrompt();
 
   try {
     const response = await fetch('https://api.anthropic.com/v1/messages', {
@@ -599,10 +628,10 @@ ${inputText}
         'anthropic-dangerous-direct-browser-access': 'true'
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 1500,
-        system: systemPrompt,
-        messages: [{ role: 'user', content: userPrompt }]
+        model: 'claude-sonnet-4-6',
+        max_tokens: 2500,
+        system,
+        messages: [{ role: 'user', content: user }]
       })
     });
 
@@ -613,34 +642,26 @@ ${inputText}
 
     const data = await response.json();
     const raw = data.content[0].text.trim();
-
     let parsed;
     try {
-      const cleaned = raw.replace(/```json|```/g, '').trim();
-      parsed = JSON.parse(cleaned);
+      parsed = JSON.parse(raw.replace(/```json|```/g, '').trim());
     } catch {
       throw new Error('응답 파싱 오류. 다시 시도해주세요.');
     }
 
-    results.summary = parsed.summary || '';
-    results.translate = parsed.translate || '';
-    results.report = parsed.report || '';
-    results.action = parsed.action || '';
-    results.oneline = parsed.oneline || '';
-
-    ['summary', 'translate', 'report', 'action', 'oneline'].forEach((key, i) => {
-      setTimeout(() => {
-        const el = document.getElementById(`body-${key}`);
-        const card = document.getElementById(`card-${key}`);
-        el.textContent = results[key];
-        el.classList.remove('placeholder');
-        card.classList.add('show');
-      }, i * 80);
-    });
+    if (currentMode === 'dingtalk') {
+      results = { summary: parsed.summary||'', translate: parsed.translate||'', report: parsed.report||'', action: parsed.action||'', oneline: parsed.oneline||'' };
+      ['summary','translate','report','action','oneline'].forEach((k,i) => setTimeout(() => showCard(k), i*80));
+    } else if (currentMode === 'meeting') {
+      results = { minutes: parsed.minutes||'', 'minutes-ko': parsed.minutes_ko||'', issue: parsed.issue||'' };
+      ['minutes','minutes-ko','issue'].forEach((k,i) => setTimeout(() => showCard(k), i*80));
+    } else if (currentMode === 'letter') {
+      results = { 'letter-ko': parsed.letter_ko||'', 'letter-zh': parsed.letter_zh||'', 'letter-point': parsed.letter_point||'' };
+      ['letter-ko','letter-zh','letter-point'].forEach((k,i) => setTimeout(() => showCard(k), i*80));
+    }
 
     document.getElementById('apiStatus').className = 'api-status ok';
-
-  } catch (e) {
+  } catch(e) {
     document.getElementById('apiStatus').className = 'api-status err';
     showError('오류: ' + e.message);
   } finally {
@@ -648,56 +669,48 @@ ${inputText}
   }
 }
 
+function showCard(key) {
+  const el = document.getElementById(`body-${key}`);
+  const card = document.getElementById(`card-${key}`);
+  if (!el || !card) return;
+  el.textContent = results[key];
+  el.classList.remove('placeholder');
+  card.classList.add('show');
+}
+
 function setLoading(on) {
   const btn = document.getElementById('analyzeBtn');
-  const spinner = document.getElementById('spinner');
-  const bar = document.getElementById('loadingBar');
+  document.getElementById('spinner').style.display = on ? 'block' : 'none';
+  document.getElementById('loadingBar').style.display = on ? 'block' : 'none';
   btn.disabled = on;
-  spinner.style.display = on ? 'block' : 'none';
-  bar.style.display = on ? 'block' : 'none';
   hideError();
 }
 
-function clearResults() {
-  ['summary', 'translate', 'report', 'action', 'oneline'].forEach(key => {
-    const el = document.getElementById(`body-${key}`);
-    const card = document.getElementById(`card-${key}`);
-    el.textContent = '분석 중...';
-    el.classList.add('placeholder');
-    card.classList.remove('show');
+function clearAllResults() {
+  const allKeys = ['summary','translate','report','action','oneline','minutes','minutes-ko','issue','letter-ko','letter-zh','letter-point'];
+  allKeys.forEach(k => {
+    const el = document.getElementById(`body-${k}`);
+    const card = document.getElementById(`card-${k}`);
+    if (el) { el.textContent = '분석 중...'; el.classList.add('placeholder'); }
+    if (card) card.classList.remove('show');
   });
+  results = {};
 }
 
-function showError(msg) {
-  const el = document.getElementById('errorMsg');
-  el.textContent = msg;
-  el.style.display = 'block';
-}
-
-function hideError() {
-  document.getElementById('errorMsg').style.display = 'none';
-}
+function showError(msg) { const el = document.getElementById('errorMsg'); el.textContent = msg; el.style.display = 'block'; }
+function hideError() { document.getElementById('errorMsg').style.display = 'none'; }
 
 async function copyResult(key) {
   const text = results[key];
   if (!text) return;
   try {
     await navigator.clipboard.writeText(text);
-    const btns = document.querySelectorAll(`#card-${key} .copy-btn`);
-    btns.forEach(btn => {
-      btn.textContent = '복사됨 ✓';
-      btn.classList.add('copied');
-      setTimeout(() => {
-        btn.textContent = '복사';
-        btn.classList.remove('copied');
-      }, 1800);
-    });
-  } catch { }
+    const btn = document.querySelector(`#card-${key} .copy-btn`);
+    if (btn) { btn.textContent = '복사됨 ✓'; btn.classList.add('copied'); setTimeout(() => { btn.textContent = '복사'; btn.classList.remove('copied'); }, 1800); }
+  } catch(e) {}
 }
 
-document.addEventListener('keydown', (e) => {
-  if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') analyze();
-});
+document.addEventListener('keydown', e => { if ((e.ctrlKey||e.metaKey) && e.key==='Enter') analyze(); });
 </script>
 </body>
 </html>
