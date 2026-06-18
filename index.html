@@ -855,14 +855,15 @@ function renderSidebar(list) {
     const d = new Date(item.created_at);
     const time = `${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
     const recip = item.recipient&&item.mode==='dingtalk'?` · ${item.recipient==='guangming'?'광밍':item.recipient==='songyi'?'송이님':item.recipient==='dept'?'유관부서':'카드사'}`:'';
-    return `<div class="sidebar-item${item.pinned?' pinned':''}" ondblclick="loadHistoryItem(${item.id})">
+    return `<div class="sidebar-item${item.pinned?' pinned':''}">
       <div class="sidebar-item-head">
         <span class="sidebar-mode-tag tag-${item.mode}">${modeLabels[item.mode]||item.mode}${recip}</span>
         <span class="sidebar-time">${time}</span>
-        <button class="sidebar-pin${item.pinned?' on':''}" onclick="togglePin(${item.id},${!item.pinned})" title="고정">📌</button>
-        <button class="sidebar-del" onclick="deleteHistoryItem(${item.id})" title="삭제">✕</button>
+        <button class="sidebar-pin${item.pinned?' on':''}" onclick="event.stopPropagation();togglePin(${item.id},${!item.pinned})" title="고정">📌</button>
+        <button class="sidebar-del" onclick="event.stopPropagation();deleteHistoryItem(${item.id})" title="삭제">✕</button>
       </div>
-      <div class="sidebar-preview">${(item.title||item.input_text||'').replace(/</g,'&lt;')}</div>
+      <div class="sidebar-preview" onclick="loadHistoryItem(${item.id})" style="cursor:pointer;">${(item.title||item.input_text||'').replace(/</g,'&lt;')}</div>
+      <button onclick="loadHistoryItem(${item.id})" style="width:100%;margin-top:6px;font-size:11px;padding:4px;border-radius:6px;border:0.5px solid var(--green);background:var(--green-light);color:var(--green-dark);cursor:pointer;font-family:inherit;">불러오기</button>
     </div>`;
   }).join('');
 }
