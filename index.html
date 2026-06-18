@@ -150,6 +150,10 @@ header { background: var(--surface); border-bottom: 0.5px solid var(--border); h
 .result-subtitle { font-size: 10px; color: var(--muted); }
 .result-body { font-size: 12px; line-height: 1.8; color: var(--text); white-space: pre-wrap; word-break: break-word; flex: 1; min-height: 60px; }
 .result-body.placeholder { color: var(--muted); font-style: italic; }
+.result-body[contenteditable="true"] { outline: none; border: 0.5px solid var(--green); border-radius: 6px; padding: 6px 8px; background: #fafffe; cursor: text; }
+.edit-btn { font-size: 11px; padding: 2px 8px; border-radius: 6px; border: 0.5px solid var(--border); background: var(--bg); color: var(--muted); cursor: pointer; font-family: inherit; transition: all 0.15s; }
+.edit-btn:hover { border-color: var(--green); color: var(--green-dark); }
+.edit-btn.active { background: var(--green-light); color: var(--green-dark); border-color: var(--green); }
 .result-body table { width: 100%; border-collapse: collapse; font-size: 12px; margin: 4px 0; }
 .result-body table th { background: #f5f6f8; padding: 6px 10px; border: 0.5px solid var(--border); font-weight: 500; text-align: left; font-size: 11px; }
 .result-body table td { padding: 6px 10px; border: 0.5px solid var(--border); }
@@ -270,6 +274,7 @@ header { background: var(--surface); border-bottom: 0.5px solid var(--border); h
             <div class="result-icon icon-summary"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg></div>
             <div><div class="result-title">상황 요약</div><div class="result-subtitle">핵심 3줄</div></div>
           </div>
+          <button class="edit-btn" id="edit-summary" onclick="toggleEdit('summary')">✏️ 편집</button>
         </div>
         <div class="result-body placeholder" id="body-summary">분석 결과가 여기에 표시됩니다</div>
         <div class="lang-footer" id="footer-summary">
@@ -286,6 +291,7 @@ header { background: var(--surface); border-bottom: 0.5px solid var(--border); h
             <div class="result-icon icon-translate"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"/></svg></div>
             <div><div class="result-title">번역본</div><div class="result-subtitle" id="translate-subtitle">한 ↔ 중</div></div>
           </div>
+          <button class="edit-btn" id="edit-translate" onclick="toggleEdit('translate')">✏️ 편집</button>
         </div>
         <div class="result-body placeholder" id="body-translate">분석 결과가 여기에 표시됩니다</div>
         <div class="lang-footer" id="footer-translate">
@@ -302,6 +308,7 @@ header { background: var(--surface); border-bottom: 0.5px solid var(--border); h
             <div class="result-icon icon-report"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></div>
             <div><div class="result-title">딩톡 답장 초안</div><div class="result-subtitle" id="report-subtitle">수신자 맞춤</div></div>
           </div>
+          <button class="edit-btn" id="edit-report" onclick="toggleEdit('report')">✏️ 편집</button>
         </div>
         <div class="result-body placeholder" id="body-report">분석 결과가 여기에 표시됩니다</div>
         <div class="lang-footer" id="footer-report">
@@ -318,6 +325,7 @@ header { background: var(--surface); border-bottom: 0.5px solid var(--border); h
             <div class="result-icon icon-action"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
             <div><div class="result-title">액션 아이템</div><div class="result-subtitle">우선순위</div></div>
           </div>
+          <button class="edit-btn" id="edit-action" onclick="toggleEdit('action')">✏️ 편집</button>
         </div>
         <div class="result-body placeholder" id="body-action">분석 결과가 여기에 표시됩니다</div>
         <div class="lang-footer" id="footer-action">
@@ -334,6 +342,7 @@ header { background: var(--surface); border-bottom: 0.5px solid var(--border); h
             <div class="result-icon icon-oneline"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 13.5a19.79 19.79 0 01-3.07-8.67A2 2 0 012 2.81h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.91 10a16 16 0 006 6l.31-.31a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0120 18v2.92z"/></svg></div>
             <div><div class="result-title">유관부서 공유용 한 줄 요약</div><div class="result-subtitle">내부 공유용</div></div>
           </div>
+          <button class="edit-btn" id="edit-oneline" onclick="toggleEdit('oneline')">✏️ 편집</button>
         </div>
         <div class="result-body placeholder" id="body-oneline">분석 결과가 여기에 표시됩니다</div>
         <div class="lang-footer" id="footer-oneline">
@@ -354,6 +363,7 @@ header { background: var(--surface); border-bottom: 0.5px solid var(--border); h
             <div class="result-icon icon-minutes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></div>
             <div><div class="result-title">会议纪要 (语雀 스타일)</div><div class="result-subtitle">중국어 서면체</div></div>
           </div>
+          <button class="edit-btn" id="edit-minutes" onclick="toggleEdit('minutes')">✏️ 편집</button>
         </div>
         <div class="result-body placeholder" id="body-minutes">분석 결과가 여기에 표시됩니다</div>
         <div class="lang-footer" id="footer-minutes">
@@ -370,6 +380,7 @@ header { background: var(--surface); border-bottom: 0.5px solid var(--border); h
             <div class="result-icon icon-translate"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg></div>
             <div><div class="result-title">한국어 요약본</div><div class="result-subtitle">Songyi님 보고용</div></div>
           </div>
+          <button class="edit-btn" id="edit-minutes-ko" onclick="toggleEdit('minutes-ko')">✏️ 편집</button>
         </div>
         <div class="result-body placeholder" id="body-minutes-ko">분석 결과가 여기에 표시됩니다</div>
         <div class="lang-footer" id="footer-minutes-ko">
@@ -386,6 +397,7 @@ header { background: var(--surface); border-bottom: 0.5px solid var(--border); h
             <div class="result-icon icon-issue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
             <div><div class="result-title">리스크 · 이슈</div><div class="result-subtitle">내가 판단할 것</div></div>
           </div>
+          <button class="edit-btn" id="edit-issue" onclick="toggleEdit('issue')">✏️ 편집</button>
         </div>
         <div class="result-body placeholder" id="body-issue">분석 결과가 여기에 표시됩니다</div>
         <div class="lang-footer" id="footer-issue">
@@ -406,6 +418,7 @@ header { background: var(--surface); border-bottom: 0.5px solid var(--border); h
             <div class="result-icon icon-report"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
             <div><div class="result-title">한국어 공문 초안</div><div class="result-subtitle">카드사 발송용</div></div>
           </div>
+          <button class="edit-btn" id="edit-letter-ko" onclick="toggleEdit('letter-ko')">✏️ 편집</button>
         </div>
         <div class="result-body placeholder" id="body-letter-ko">분석 결과가 여기에 표시됩니다</div>
         <div class="lang-footer" id="footer-letter-ko">
@@ -422,6 +435,7 @@ header { background: var(--surface); border-bottom: 0.5px solid var(--border); h
             <div class="result-icon icon-translate"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"/></svg></div>
             <div><div class="result-title">중국어 공문 초안</div><div class="result-subtitle">HQ 보고용 · 飞书</div></div>
           </div>
+          <button class="edit-btn" id="edit-letter-zh" onclick="toggleEdit('letter-zh')">✏️ 편집</button>
         </div>
         <div class="result-body placeholder" id="body-letter-zh">분석 결과가 여기에 표시됩니다</div>
         <div class="lang-footer" id="footer-letter-zh">
@@ -438,6 +452,7 @@ header { background: var(--surface); border-bottom: 0.5px solid var(--border); h
             <div class="result-icon icon-action"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
             <div><div class="result-title">협상 포인트 · 체크리스트</div><div class="result-subtitle">발송 전 확인</div></div>
           </div>
+          <button class="edit-btn" id="edit-letter-point" onclick="toggleEdit('letter-point')">✏️ 편집</button>
         </div>
         <div class="result-body placeholder" id="body-letter-point">분석 결과가 여기에 표시됩니다</div>
         <div class="lang-footer" id="footer-letter-point">
@@ -693,8 +708,7 @@ async function analyze() {
     // 미리보기
     const previewKey = currentMode==='dingtalk'?'summary':currentMode==='meeting'?'minutes-ko':'letter-ko';
     const previewText = results[previewKey]||'';
-    document.getElementById('previewText').textContent = previewText.slice(0,120)+(previewText.length>120?'...':'');
-    document.getElementById('previewText').style.color = '';
+    const pvEl = document.getElementById('previewText'); if(pvEl){ pvEl.textContent = previewText.slice(0,120)+(previewText.length>120?'...':''); pvEl.style.color=''; }
 
     document.getElementById('apiDot').className = 'api-dot ok';
     tabState[currentMode].results = {...results};
@@ -776,6 +790,38 @@ async function langCopy(cardId) {
   if (btn) { btn.textContent='복사됨 ✓'; btn.classList.add('copied'); setTimeout(()=>{ btn.textContent='복사'; btn.classList.remove('copied'); },1800); }
 }
 
+// EDIT MODE
+function toggleEdit(cardId) {
+  const el = document.getElementById(`body-${cardId}`);
+  const btn = document.getElementById(`edit-${cardId}`);
+  const isEditing = el.contentEditable === 'true';
+
+  if (isEditing) {
+    // 편집 완료 - 내용 저장
+    el.contentEditable = 'false';
+    btn.textContent = '✏️ 편집';
+    btn.classList.remove('active');
+    // 수정된 텍스트를 results에 반영
+    results[cardId] = el.innerText;
+    langCache[cardId] = { ko: null, zh: null, en: null };
+    const defaultLang = cardId==='minutes'||cardId==='letter-zh'?'zh':'ko';
+    langCache[cardId][defaultLang] = results[cardId];
+  } else {
+    // 편집 시작
+    el.contentEditable = 'true';
+    btn.textContent = '✅ 완료';
+    btn.classList.add('active');
+    el.focus();
+    // 커서를 끝으로
+    const range = document.createRange();
+    const sel = window.getSelection();
+    range.selectNodeContents(el);
+    range.collapse(false);
+    sel.removeAllRanges();
+    sel.addRange(range);
+  }
+}
+
 // SUPABASE
 async function saveToSupabase(inputText, mode, recipient, resultsData, pinned) {
   const title = inputText.slice(0,50);
@@ -843,8 +889,7 @@ async function loadHistoryItem(id) {
     Object.keys(results).forEach((k,i) => setTimeout(()=>showCard(k), i*80));
     const previewKey = item.mode==='dingtalk'?'summary':item.mode==='meeting'?'minutes-ko':'letter-ko';
     const previewText = results[previewKey]||'';
-    document.getElementById('previewText').textContent = previewText.slice(0,120)+(previewText.length>120?'...':'');
-    document.getElementById('previewText').style.color='';
+    const pvEl3=document.getElementById('previewText'); if(pvEl3){pvEl3.textContent=previewText.slice(0,120)+(previewText.length>120?'...':''); pvEl3.style.color='';}
   } catch(e) { console.error(e); }
 }
 
