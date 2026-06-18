@@ -629,7 +629,7 @@ async function analyze() {
       },
       body: JSON.stringify({
         model: 'claude-sonnet-4-6',
-        max_tokens: 2500,
+        max_tokens: 4000,
         system,
         messages: [{ role: 'user', content: user }]
       })
@@ -646,9 +646,14 @@ async function analyze() {
     const raw = data.content[0].text.trim();
     let parsed;
     try {
-      parsed = JSON.parse(raw.replace(/```json|```/g, '').trim());
+      let cleaned = raw.replace(/```json|```/g, '').trim();
+      // JSON 블록만 추출
+      const jsonMatch = cleaned.match(/\{[\s\S]*\}/);
+      if (jsonMatch) cleaned = jsonMatch[0];
+      parsed = JSON.parse(cleaned);
     } catch {
-      throw new Error('응답 파싱 오류. 다시 시도해주세요.');
+      console.error('Parse failed, raw response:', raw);
+      throw new Error('응답 파싱 오류. 다시 시도해주세요. (raw: ' + raw.slice(0, 100) + ')');
     }
 
     if (currentMode === 'dingtalk') {
