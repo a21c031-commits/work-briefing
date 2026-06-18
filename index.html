@@ -637,7 +637,9 @@ async function analyze() {
 
     if (!response.ok) {
       const err = await response.json().catch(() => ({}));
-      throw new Error(err.error?.message || `HTTP ${response.status}`);
+      const msg = err.error?.message || `HTTP ${response.status}`;
+      console.error('API Error:', response.status, err);
+      throw new Error(`[${response.status}] ${msg}`);
     }
 
     const data = await response.json();
@@ -664,6 +666,7 @@ async function analyze() {
   } catch(e) {
     document.getElementById('apiStatus').className = 'api-status err';
     showError('오류: ' + e.message);
+    console.error('Analyze error:', e);
   } finally {
     setLoading(false);
   }
