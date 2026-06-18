@@ -215,6 +215,20 @@ textarea::placeholder { color: var(--muted); font-size: 13px; }
   margin-bottom: 16px; display: none;
 }
 .meeting-hint.show { display: block; }
+
+/* LANG TABS */
+.lang-footer { display: flex; align-items: center; justify-content: space-between; padding-top: 10px; border-top: 1px solid var(--border); margin-top: 4px; gap: 8px; }
+.lang-tabs { display: flex; gap: 4px; }
+.lang-tab { font-family: 'Noto Sans KR', sans-serif; font-size: 11px; padding: 3px 10px; border: 1px solid var(--border); border-radius: 20px; background: transparent; color: var(--muted); cursor: pointer; transition: all 0.15s; }
+.lang-tab:hover { border-color: var(--accent-muted); color: var(--accent); }
+.lang-tab.active { background: var(--accent); color: white; border-color: var(--accent); }
+.lang-translate-btn { font-family: 'Noto Sans KR', sans-serif; font-size: 11px; padding: 3px 12px; border: 1px solid var(--accent-muted); border-radius: 6px; background: var(--accent-light); color: var(--accent); cursor: pointer; transition: all 0.15s; display: flex; align-items: center; gap: 4px; }
+.lang-translate-btn:hover { background: var(--accent); color: white; }
+.lang-translate-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.lang-copy-btn { font-size: 11px; padding: 3px 10px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg); color: var(--muted); cursor: pointer; transition: all 0.15s; }
+.lang-copy-btn:hover { border-color: var(--accent-muted); color: var(--accent); }
+.lang-copy-btn.copied { background: var(--accent-light); color: var(--accent); border-color: var(--accent-muted); }
+.lang-mini-spinner { width: 10px; height: 10px; border: 1.5px solid rgba(255,255,255,0.3); border-top-color: currentColor; border-radius: 50%; animation: spin 0.7s linear infinite; display: none; }
 </style>
 </head>
 <body>
@@ -294,6 +308,20 @@ textarea::placeholder { color: var(--muted); font-size: 13px; }
         <button class="copy-btn" onclick="copyResult('summary')">복사</button>
       </div>
       <div class="result-body placeholder" id="body-summary">분석 결과가 여기에 표시됩니다</div>
+      <div class="lang-footer" id="footer-summary" style="display:none">
+        <div class="lang-tabs">
+          <button class="lang-tab active" data-lang="ko" onclick="selectLang('summary','ko',this)">한국어</button>
+          <button class="lang-tab" data-lang="zh" onclick="selectLang('summary','zh',this)">中文</button>
+          <button class="lang-tab" data-lang="en" onclick="selectLang('summary','en',this)">English</button>
+        </div>
+        <div style="display:flex;gap:6px;align-items:center">
+          <button class="lang-translate-btn" id="tbtn-summary" onclick="translateCard('summary')">
+            <span class="lang-mini-spinner" id="tspinner-summary"></span>
+            번역
+          </button>
+          <button class="lang-copy-btn" id="lcopy-summary" onclick="langCopy('summary')">복사</button>
+        </div>
+      </div>
     </div>
     <div class="result-card" id="card-translate">
       <div class="result-header">
@@ -303,6 +331,20 @@ textarea::placeholder { color: var(--muted); font-size: 13px; }
         <button class="copy-btn" onclick="copyResult('translate')">복사</button>
       </div>
       <div class="result-body placeholder" id="body-translate">분석 결과가 여기에 표시됩니다</div>
+      <div class="lang-footer" id="footer-translate" style="display:none">
+        <div class="lang-tabs">
+          <button class="lang-tab active" data-lang="ko" onclick="selectLang('translate','ko',this)">한국어</button>
+          <button class="lang-tab" data-lang="zh" onclick="selectLang('translate','zh',this)">中文</button>
+          <button class="lang-tab" data-lang="en" onclick="selectLang('translate','en',this)">English</button>
+        </div>
+        <div style="display:flex;gap:6px;align-items:center">
+          <button class="lang-translate-btn" id="tbtn-translate" onclick="translateCard('translate')">
+            <span class="lang-mini-spinner" id="tspinner-translate"></span>
+            번역
+          </button>
+          <button class="lang-copy-btn" id="lcopy-translate" onclick="langCopy('translate')">복사</button>
+        </div>
+      </div>
     </div>
     <div class="result-card" id="card-report">
       <div class="result-header">
@@ -312,6 +354,20 @@ textarea::placeholder { color: var(--muted); font-size: 13px; }
         <button class="copy-btn" onclick="copyResult('report')">복사</button>
       </div>
       <div class="result-body placeholder" id="body-report">분석 결과가 여기에 표시됩니다</div>
+      <div class="lang-footer" id="footer-report" style="display:none">
+        <div class="lang-tabs">
+          <button class="lang-tab active" data-lang="ko" onclick="selectLang('report','ko',this)">한국어</button>
+          <button class="lang-tab" data-lang="zh" onclick="selectLang('report','zh',this)">中文</button>
+          <button class="lang-tab" data-lang="en" onclick="selectLang('report','en',this)">English</button>
+        </div>
+        <div style="display:flex;gap:6px;align-items:center">
+          <button class="lang-translate-btn" id="tbtn-report" onclick="translateCard('report')">
+            <span class="lang-mini-spinner" id="tspinner-report"></span>
+            번역
+          </button>
+          <button class="lang-copy-btn" id="lcopy-report" onclick="langCopy('report')">복사</button>
+        </div>
+      </div>
     </div>
     <div class="result-card" id="card-action">
       <div class="result-header">
@@ -321,6 +377,20 @@ textarea::placeholder { color: var(--muted); font-size: 13px; }
         <button class="copy-btn" onclick="copyResult('action')">복사</button>
       </div>
       <div class="result-body placeholder" id="body-action">분석 결과가 여기에 표시됩니다</div>
+      <div class="lang-footer" id="footer-action" style="display:none">
+        <div class="lang-tabs">
+          <button class="lang-tab active" data-lang="ko" onclick="selectLang('action','ko',this)">한국어</button>
+          <button class="lang-tab" data-lang="zh" onclick="selectLang('action','zh',this)">中文</button>
+          <button class="lang-tab" data-lang="en" onclick="selectLang('action','en',this)">English</button>
+        </div>
+        <div style="display:flex;gap:6px;align-items:center">
+          <button class="lang-translate-btn" id="tbtn-action" onclick="translateCard('action')">
+            <span class="lang-mini-spinner" id="tspinner-action"></span>
+            번역
+          </button>
+          <button class="lang-copy-btn" id="lcopy-action" onclick="langCopy('action')">복사</button>
+        </div>
+      </div>
     </div>
     <div class="result-card full-width" id="card-oneline">
       <div class="result-header">
@@ -330,6 +400,20 @@ textarea::placeholder { color: var(--muted); font-size: 13px; }
         <button class="copy-btn" onclick="copyResult('oneline')">복사</button>
       </div>
       <div class="result-body placeholder" id="body-oneline">분석 결과가 여기에 표시됩니다</div>
+      <div class="lang-footer" id="footer-oneline" style="display:none">
+        <div class="lang-tabs">
+          <button class="lang-tab active" data-lang="ko" onclick="selectLang('oneline','ko',this)">한국어</button>
+          <button class="lang-tab" data-lang="zh" onclick="selectLang('oneline','zh',this)">中文</button>
+          <button class="lang-tab" data-lang="en" onclick="selectLang('oneline','en',this)">English</button>
+        </div>
+        <div style="display:flex;gap:6px;align-items:center">
+          <button class="lang-translate-btn" id="tbtn-oneline" onclick="translateCard('oneline')">
+            <span class="lang-mini-spinner" id="tspinner-oneline"></span>
+            번역
+          </button>
+          <button class="lang-copy-btn" id="lcopy-oneline" onclick="langCopy('oneline')">복사</button>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -343,6 +427,20 @@ textarea::placeholder { color: var(--muted); font-size: 13px; }
         <button class="copy-btn" onclick="copyResult('minutes')">복사</button>
       </div>
       <div class="result-body placeholder" id="body-minutes">분석 결과가 여기에 표시됩니다</div>
+      <div class="lang-footer" id="footer-minutes" style="display:none">
+        <div class="lang-tabs">
+          <button class="lang-tab active" data-lang="ko" onclick="selectLang('minutes','ko',this)">한국어</button>
+          <button class="lang-tab" data-lang="zh" onclick="selectLang('minutes','zh',this)">中文</button>
+          <button class="lang-tab" data-lang="en" onclick="selectLang('minutes','en',this)">English</button>
+        </div>
+        <div style="display:flex;gap:6px;align-items:center">
+          <button class="lang-translate-btn" id="tbtn-minutes" onclick="translateCard('minutes')">
+            <span class="lang-mini-spinner" id="tspinner-minutes"></span>
+            번역
+          </button>
+          <button class="lang-copy-btn" id="lcopy-minutes" onclick="langCopy('minutes')">복사</button>
+        </div>
+      </div>
     </div>
     <div class="result-card" id="card-minutes-ko">
       <div class="result-header">
@@ -352,6 +450,20 @@ textarea::placeholder { color: var(--muted); font-size: 13px; }
         <button class="copy-btn" onclick="copyResult('minutes-ko')">복사</button>
       </div>
       <div class="result-body placeholder" id="body-minutes-ko">분석 결과가 여기에 표시됩니다</div>
+      <div class="lang-footer" id="footer-minutes-ko" style="display:none">
+        <div class="lang-tabs">
+          <button class="lang-tab active" data-lang="ko" onclick="selectLang('minutes-ko','ko',this)">한국어</button>
+          <button class="lang-tab" data-lang="zh" onclick="selectLang('minutes-ko','zh',this)">中文</button>
+          <button class="lang-tab" data-lang="en" onclick="selectLang('minutes-ko','en',this)">English</button>
+        </div>
+        <div style="display:flex;gap:6px;align-items:center">
+          <button class="lang-translate-btn" id="tbtn-minutes-ko" onclick="translateCard('minutes-ko')">
+            <span class="lang-mini-spinner" id="tspinner-minutes-ko"></span>
+            번역
+          </button>
+          <button class="lang-copy-btn" id="lcopy-minutes-ko" onclick="langCopy('minutes-ko')">복사</button>
+        </div>
+      </div>
     </div>
     <div class="result-card" id="card-issue">
       <div class="result-header">
@@ -361,6 +473,20 @@ textarea::placeholder { color: var(--muted); font-size: 13px; }
         <button class="copy-btn" onclick="copyResult('issue')">복사</button>
       </div>
       <div class="result-body placeholder" id="body-issue">분석 결과가 여기에 표시됩니다</div>
+      <div class="lang-footer" id="footer-issue" style="display:none">
+        <div class="lang-tabs">
+          <button class="lang-tab active" data-lang="ko" onclick="selectLang('issue','ko',this)">한국어</button>
+          <button class="lang-tab" data-lang="zh" onclick="selectLang('issue','zh',this)">中文</button>
+          <button class="lang-tab" data-lang="en" onclick="selectLang('issue','en',this)">English</button>
+        </div>
+        <div style="display:flex;gap:6px;align-items:center">
+          <button class="lang-translate-btn" id="tbtn-issue" onclick="translateCard('issue')">
+            <span class="lang-mini-spinner" id="tspinner-issue"></span>
+            번역
+          </button>
+          <button class="lang-copy-btn" id="lcopy-issue" onclick="langCopy('issue')">복사</button>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -374,6 +500,20 @@ textarea::placeholder { color: var(--muted); font-size: 13px; }
         <button class="copy-btn" onclick="copyResult('letter-ko')">복사</button>
       </div>
       <div class="result-body placeholder" id="body-letter-ko">분석 결과가 여기에 표시됩니다</div>
+      <div class="lang-footer" id="footer-letter-ko" style="display:none">
+        <div class="lang-tabs">
+          <button class="lang-tab active" data-lang="ko" onclick="selectLang('letter-ko','ko',this)">한국어</button>
+          <button class="lang-tab" data-lang="zh" onclick="selectLang('letter-ko','zh',this)">中文</button>
+          <button class="lang-tab" data-lang="en" onclick="selectLang('letter-ko','en',this)">English</button>
+        </div>
+        <div style="display:flex;gap:6px;align-items:center">
+          <button class="lang-translate-btn" id="tbtn-letter-ko" onclick="translateCard('letter-ko')">
+            <span class="lang-mini-spinner" id="tspinner-letter-ko"></span>
+            번역
+          </button>
+          <button class="lang-copy-btn" id="lcopy-letter-ko" onclick="langCopy('letter-ko')">복사</button>
+        </div>
+      </div>
     </div>
     <div class="result-card full-width" id="card-letter-zh">
       <div class="result-header">
@@ -383,6 +523,20 @@ textarea::placeholder { color: var(--muted); font-size: 13px; }
         <button class="copy-btn" onclick="copyResult('letter-zh')">복사</button>
       </div>
       <div class="result-body placeholder" id="body-letter-zh">분석 결과가 여기에 표시됩니다</div>
+      <div class="lang-footer" id="footer-letter-zh" style="display:none">
+        <div class="lang-tabs">
+          <button class="lang-tab active" data-lang="ko" onclick="selectLang('letter-zh','ko',this)">한국어</button>
+          <button class="lang-tab" data-lang="zh" onclick="selectLang('letter-zh','zh',this)">中文</button>
+          <button class="lang-tab" data-lang="en" onclick="selectLang('letter-zh','en',this)">English</button>
+        </div>
+        <div style="display:flex;gap:6px;align-items:center">
+          <button class="lang-translate-btn" id="tbtn-letter-zh" onclick="translateCard('letter-zh')">
+            <span class="lang-mini-spinner" id="tspinner-letter-zh"></span>
+            번역
+          </button>
+          <button class="lang-copy-btn" id="lcopy-letter-zh" onclick="langCopy('letter-zh')">복사</button>
+        </div>
+      </div>
     </div>
     <div class="result-card full-width" id="card-letter-point">
       <div class="result-header">
@@ -392,6 +546,20 @@ textarea::placeholder { color: var(--muted); font-size: 13px; }
         <button class="copy-btn" onclick="copyResult('letter-point')">복사</button>
       </div>
       <div class="result-body placeholder" id="body-letter-point">분석 결과가 여기에 표시됩니다</div>
+      <div class="lang-footer" id="footer-letter-point" style="display:none">
+        <div class="lang-tabs">
+          <button class="lang-tab active" data-lang="ko" onclick="selectLang('letter-point','ko',this)">한국어</button>
+          <button class="lang-tab" data-lang="zh" onclick="selectLang('letter-point','zh',this)">中文</button>
+          <button class="lang-tab" data-lang="en" onclick="selectLang('letter-point','en',this)">English</button>
+        </div>
+        <div style="display:flex;gap:6px;align-items:center">
+          <button class="lang-translate-btn" id="tbtn-letter-point" onclick="translateCard('letter-point')">
+            <span class="lang-mini-spinner" id="tspinner-letter-point"></span>
+            번역
+          </button>
+          <button class="lang-copy-btn" id="lcopy-letter-point" onclick="langCopy('letter-point')">복사</button>
+        </div>
+      </div>
     </div>
   </div>
 </main>
@@ -701,6 +869,90 @@ function showCard(key) {
   el.textContent = results[key];
   el.classList.remove('placeholder');
   card.classList.add('show');
+  // lang footer 표시
+  const footer = document.getElementById(`footer-${key}`);
+  if (footer) footer.style.display = 'flex';
+  // lang 캐시 초기화
+  langCache[key] = { ko: results[key], zh: null, en: null };
+  langSelected[key] = 'ko';
+}
+
+// ── LANG TRANSLATE ─────────────────────────────────────
+const langCache = {};
+const langSelected = {};
+
+function selectLang(cardId, lang, btn) {
+  langSelected[cardId] = lang;
+  document.querySelectorAll(`#footer-${cardId} .lang-tab`).forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  // 캐시 있으면 바로 표시
+  if (langCache[cardId] && langCache[cardId][lang]) {
+    document.getElementById(`body-${cardId}`).textContent = langCache[cardId][lang];
+  }
+}
+
+async function translateCard(cardId) {
+  const apiKey = apiKeyInput.value.trim();
+  const lang = langSelected[cardId] || 'ko';
+  const originalText = results[cardId];
+  if (!apiKey || !originalText) return;
+  
+  // 캐시 있으면 스킵
+  if (langCache[cardId] && langCache[cardId][lang]) {
+    document.getElementById(`body-${cardId}`).textContent = langCache[cardId][lang];
+    return;
+  }
+
+  const langNames = { ko: '한국어', zh: '중국어(간체, 비즈니스 서면체)', en: 'English (business tone)' };
+  const btn = document.getElementById(`tbtn-${cardId}`);
+  const spinner = document.getElementById(`tspinner-${cardId}`);
+  btn.disabled = true;
+  spinner.style.display = 'inline-block';
+
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 1500,
+        messages: [{
+          role: 'user',
+          content: `다음 비즈니스 텍스트를 ${langNames[lang]}로 번역해줘. AliExpress Korea 결제 마케팅 맥락. 번역문만 출력, 설명 없이.
+
+${originalText}`
+        }]
+      })
+    });
+    const data = await response.json();
+    const translated = data.content[0].text.trim();
+    if (!langCache[cardId]) langCache[cardId] = {};
+    langCache[cardId][lang] = translated;
+    document.getElementById(`body-${cardId}`).textContent = translated;
+  } catch(e) {
+    console.error('Translation error:', e);
+  } finally {
+    btn.disabled = false;
+    spinner.style.display = 'none';
+  }
+}
+
+async function langCopy(cardId) {
+  const lang = langSelected[cardId] || 'ko';
+  const text = langCache[cardId]?.[lang] || results[cardId] || '';
+  if (!text) return;
+  try {
+    await navigator.clipboard.writeText(text);
+    const btn = document.getElementById(`lcopy-${cardId}`);
+    btn.textContent = '복사됨 ✓';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = '복사'; btn.classList.remove('copied'); }, 1800);
+  } catch(e) {}
 }
 
 function setLoading(on) {
@@ -716,10 +968,18 @@ function clearAllResults() {
   allKeys.forEach(k => {
     const el = document.getElementById(`body-${k}`);
     const card = document.getElementById(`card-${k}`);
+    const footer = document.getElementById(`footer-${k}`);
     if (el) { el.textContent = '분석 중...'; el.classList.add('placeholder'); }
     if (card) card.classList.remove('show');
+    if (footer) footer.style.display = 'none';
+    // lang 탭 초기화
+    if (footer) {
+      footer.querySelectorAll('.lang-tab').forEach((b,i) => { b.classList.toggle('active', i===0); });
+    }
   });
   results = {};
+  Object.keys(langCache).forEach(k => delete langCache[k]);
+  Object.keys(langSelected).forEach(k => delete langSelected[k]);
 }
 
 function showError(msg) { const el = document.getElementById('errorMsg'); el.textContent = msg; el.style.display = 'block'; }
