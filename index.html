@@ -87,6 +87,11 @@ header { background: var(--surface); border-bottom: 0.5px solid var(--border); h
 
 /* INPUT PANELS */
 .panels-wrap { background: var(--surface); border: 0.5px solid var(--border); border-radius: 12px; display: flex; flex-direction: column; }
+.input-card { background: var(--surface); border: 0.5px solid var(--border); border-radius: 12px; overflow: hidden; }
+.input-card-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px 0; }
+.input-label { font-size: 11px; font-weight: 500; color: var(--muted); letter-spacing: 0.5px; text-transform: uppercase; }
+.input-textarea { width: 100%; height: 160px; resize: vertical; border: none; outline: none; font-family: inherit; font-size: 14px; line-height: 1.7; color: var(--text); background: transparent; padding: 12px 16px; }
+.input-textarea::placeholder { color: #c4c9d4; font-size: 13px; }
 .panels-body { display: grid; grid-template-columns: 1fr 40px 1fr; flex: 1; }
 .panels-body { display: grid; grid-template-columns: 1fr 40px 1fr; flex: 1; }
 .panel { padding: 14px 16px; }
@@ -169,7 +174,7 @@ header { background: var(--surface); border-bottom: 0.5px solid var(--border); h
 <header>
   <a class="logo" href="#">
     <div class="logo-icon">🩷</div>
-    <span class="logo-text">🩷 Sangxi's Work<span class="logo-dot">.</span>Translate</span>
+    <span class="logo-text">Sangxi's Work<span class="logo-dot">.</span>Translate</span>
   </a>
 
   <div class="header-tabs">
@@ -227,51 +232,30 @@ header { background: var(--surface); border-bottom: 0.5px solid var(--border); h
       📋 会议纪要 모드 — 语雀/飞书 스타일로 출력됩니다. 【】 구조 · 파이프 테이블 · 서면 간결체
     </div>
 
-    <div class="panels-wrap">
-      <div class="panels-body">
-        <div class="panel">
-          <div class="panel-header">
-            <div class="panel-lang" id="inputLangLabel">
-              입력
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
-            </div>
-            <span class="panel-badge plain" id="langBadge">언어 자동 감지</span>
+    <div class="input-card">
+      <div class="input-card-header">
+        <span class="input-label" id="inputLangLabel">대화 내용 붙여넣기</span>
+        <span class="panel-badge plain" id="langBadge">언어 자동 감지</span>
+      </div>
+      <textarea class="input-textarea" id="inputText" placeholder="딩톡/위챗 대화 내용을 붙여넣으세요. 한국어·中文 모두 가능합니다."></textarea>
+      <div class="panel-footer">
+        <div class="tone-row">
+          <span class="tone-label">톤</span>
+          <div class="tone-btns">
+            <button class="tone-btn active" data-tone="formal" onclick="selectTone(this)">공식</button>
+            <button class="tone-btn" data-tone="friendly" onclick="selectTone(this)">친근</button>
+            <button class="tone-btn" data-tone="urgent" onclick="selectTone(this)">긴급</button>
           </div>
-          <textarea class="panel-textarea" id="inputText" placeholder="딩톡/위챗 대화 내용을 붙여넣으세요. 한국어·中文 모두 가능합니다."></textarea>
         </div>
-        <div class="panel-divider">
-          <button class="swap-btn" title="언어 전환">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 16V4m0 0L3 8m4-4l4 4M17 8v12m0 0l4-4m-4 4l-4-4"/></svg>
+        <div class="footer-right">
+          <span class="char-count" id="charCount">0 / 3000</span>
+          <button class="save-btn" onclick="saveCurrentToHistory()">💾 저장</button>
+          <button class="analyze-btn" id="analyzeBtn" onclick="analyze()">
+            <div class="spinner" id="spinner"></div>
+            <svg id="analyzeBtnIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            <span id="analyzeBtnText">✨ 분석하기</span>
           </button>
         </div>
-        <div class="panel">
-          <div class="panel-header">
-            <div class="panel-lang">결과 미리보기</div>
-            <span class="panel-badge plain" id="outputLangBadge">분석 후 표시</span>
-          </div>
-          <div style="font-size:13px;color:#c4c9d4;line-height:1.7;" id="previewText">분석하기를 누르면 여기에 요약이 표시됩니다</div>
-        </div>
-      </div>
-      <div class="panel-footer">
-          <div class="tone-row">
-            <span class="tone-label">톤</span>
-            <div class="tone-btns">
-              <button class="tone-btn active" data-tone="formal" onclick="selectTone(this)">공식</button>
-              <button class="tone-btn" data-tone="friendly" onclick="selectTone(this)">친근</button>
-              <button class="tone-btn" data-tone="urgent" onclick="selectTone(this)">긴급</button>
-            </div>
-          </div>
-          <div class="footer-right">
-            <span class="char-count" id="charCount">0 / 3000</span>
-            <button class="save-btn" onclick="saveCurrentToHistory()" title="현재 결과 저장">
-              💾 저장
-            </button>
-            <button class="analyze-btn" id="analyzeBtn" onclick="analyze()">
-              <div class="spinner" id="spinner"></div>
-              <svg id="analyzeBtnIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-              <span id="analyzeBtnText">✨ 분석하기</span>
-            </button>
-          </div>
       </div>
     </div>
 
