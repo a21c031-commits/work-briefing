@@ -587,8 +587,7 @@ function switchMode(mode) {
   });
 
   // 미리보기 복원
-  if (results.summary) document.getElementById('previewText').textContent = results.summary.slice(0, 120) + '...';
-  else { document.getElementById('previewText').textContent = '분석하기를 누르면 여기에 요약이 표시됩니다'; document.getElementById('previewText').style.color = '#c4c9d4'; }
+  const _pvSM = document.getElementById('previewText'); if(_pvSM){ if(results.summary){_pvSM.textContent=results.summary.slice(0,120)+'...'; _pvSM.style.color='';} else{_pvSM.textContent='분석하기를 누르면 여기에 요약이 표시됩니다'; _pvSM.style.color='#c4c9d4';} }
 }
 
 // RECIPIENT
