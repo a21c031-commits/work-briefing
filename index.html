@@ -229,6 +229,80 @@ textarea::placeholder { color: var(--muted); font-size: 13px; }
 .lang-copy-btn:hover { border-color: var(--accent-muted); color: var(--accent); }
 .lang-copy-btn.copied { background: var(--accent-light); color: var(--accent); border-color: var(--accent-muted); }
 .lang-mini-spinner { width: 10px; height: 10px; border: 1.5px solid rgba(255,255,255,0.3); border-top-color: currentColor; border-radius: 50%; animation: spin 0.7s linear infinite; display: none; }
+
+/* HISTORY SIDEBAR */
+.history-toggle {
+  position: fixed; right: 0; top: 50%; transform: translateY(-50%);
+  background: var(--accent); color: white; border: none;
+  padding: 12px 8px; border-radius: 8px 0 0 8px;
+  cursor: pointer; font-size: 12px; writing-mode: vertical-rl;
+  letter-spacing: 1px; z-index: 200; transition: opacity 0.15s;
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+}
+.history-toggle:hover { opacity: 0.85; }
+.history-badge {
+  background: white; color: var(--accent); border-radius: 20px;
+  font-size: 10px; font-weight: 700; padding: 2px 5px;
+  writing-mode: horizontal-tb; min-width: 16px; text-align: center;
+}
+.history-sidebar {
+  position: fixed; right: -340px; top: 0; width: 340px; height: 100vh;
+  background: var(--surface); border-left: 1px solid var(--border);
+  box-shadow: -4px 0 20px rgba(0,0,0,0.08);
+  z-index: 300; transition: right 0.25s ease;
+  display: flex; flex-direction: column;
+}
+.history-sidebar.open { right: 0; }
+.history-head {
+  padding: 16px 20px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
+}
+.history-head-title { font-size: 14px; font-weight: 500; color: var(--text); }
+.history-head-right { display: flex; align-items: center; gap: 8px; }
+.history-clear-btn {
+  font-size: 11px; padding: 3px 10px; border: 1px solid #fecaca;
+  border-radius: 6px; background: transparent; color: #dc2626; cursor: pointer;
+  transition: all 0.15s;
+}
+.history-clear-btn:hover { background: #fef2f2; }
+.history-close {
+  width: 24px; height: 24px; border: none; background: var(--bg);
+  border-radius: 6px; cursor: pointer; color: var(--muted); font-size: 16px;
+  display: flex; align-items: center; justify-content: center;
+}
+.history-list { flex: 1; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 8px; }
+.history-empty { text-align: center; color: var(--muted); font-size: 13px; padding: 40px 20px; line-height: 1.8; }
+.history-item {
+  background: var(--bg); border: 1px solid var(--border); border-radius: 10px;
+  padding: 12px 14px; cursor: pointer; transition: all 0.15s;
+}
+.history-item:hover { border-color: var(--accent-muted); background: var(--accent-light); }
+.history-item-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+.history-item-meta { display: flex; align-items: center; gap: 6px; }
+.history-mode-tag { font-size: 10px; padding: 2px 8px; border-radius: 20px; font-weight: 500; }
+.tag-dingtalk { background: #e8f0ea; color: var(--mode-dingtalk); }
+.tag-meeting { background: #eef0f8; color: var(--mode-meeting); }
+.tag-letter { background: #f8ede8; color: var(--mode-letter); }
+.history-time { font-size: 10px; color: var(--muted); }
+.history-del-btn {
+  width: 18px; height: 18px; border: none; background: transparent;
+  color: var(--muted); cursor: pointer; font-size: 14px; border-radius: 4px;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  transition: all 0.15s;
+}
+.history-del-btn:hover { background: #fef2f2; color: #dc2626; }
+.history-preview { font-size: 12px; color: var(--muted); line-height: 1.5; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.history-load-btn {
+  font-size: 11px; padding: 4px 10px; border: 1px solid var(--accent-muted);
+  border-radius: 6px; background: var(--accent-light); color: var(--accent);
+  cursor: pointer; margin-top: 8px; transition: all 0.15s; width: 100%;
+}
+.history-load-btn:hover { background: var(--accent); color: white; }
+.sidebar-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.2);
+  z-index: 250; display: none;
+}
+.sidebar-overlay.show { display: block; }
 </style>
 </head>
 <body>
@@ -853,6 +927,8 @@ async function analyze() {
     }
 
     document.getElementById('apiStatus').className = 'api-status ok';
+    // 자동 저장
+    addToHistory(inputText, currentMode, selectedRecipient, {...results});
   } catch(e) {
     document.getElementById('apiStatus').className = 'api-status err';
     showError('오류: ' + e.message);
@@ -995,7 +1071,128 @@ async function copyResult(key) {
   } catch(e) {}
 }
 
+
+// ── HISTORY ────────────────────────────────────────────
+const HISTORY_KEY = 'wb_history_v2';
+const MAX_HISTORY = 30;
+
+function getHistory() {
+  try { return JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]'); } catch { return []; }
+}
+function saveHistory(list) {
+  localStorage.setItem(HISTORY_KEY, JSON.stringify(list));
+}
+function updateHistoryBadge() {
+  const n = getHistory().length;
+  document.getElementById('historyBadge').textContent = n;
+}
+function toggleHistory() {
+  const sidebar = document.getElementById('historySidebar');
+  const overlay = document.getElementById('sidebarOverlay');
+  const isOpen = sidebar.classList.contains('open');
+  sidebar.classList.toggle('open', !isOpen);
+  overlay.classList.toggle('show', !isOpen);
+  if (!isOpen) renderHistoryList();
+}
+function addToHistory(inputText, mode, recipient, results) {
+  const list = getHistory();
+  const item = {
+    id: Date.now(),
+    time: new Date().toLocaleString('ko-KR', { month:'numeric', day:'numeric', hour:'2-digit', minute:'2-digit' }),
+    mode,
+    recipient: mode === 'dingtalk' ? recipient : null,
+    input: inputText,
+    results
+  };
+  list.unshift(item);
+  if (list.length > MAX_HISTORY) list.pop();
+  saveHistory(list);
+  updateHistoryBadge();
+}
+function renderHistoryList() {
+  const list = getHistory();
+  const el = document.getElementById('historyList');
+  if (list.length === 0) {
+    el.innerHTML = '<div class="history-empty">아직 저장된 번역이 없어요.<br>분석하기를 누르면 자동 저장됩니다.</div>';
+    return;
+  }
+  const modeLabels = { dingtalk: '딩톡', meeting: '회의록', letter: '공문' };
+  el.innerHTML = list.map(item => {
+    const preview = item.input.slice(0, 80).replace(/\n/g, ' ');
+    const tagClass = `tag-${item.mode}`;
+    const recip = item.recipient ? ` · ${item.recipient === 'guangming' ? '광밍' : item.recipient === 'songyi' ? '송이님' : item.recipient === 'dept' ? '유관부서' : '카드사'}` : '';
+    return `<div class="history-item">
+      <div class="history-item-head">
+        <div class="history-item-meta">
+          <span class="history-mode-tag ${tagClass}">${modeLabels[item.mode]}${recip}</span>
+          <span class="history-time">${item.time}</span>
+        </div>
+        <button class="history-del-btn" onclick="event.stopPropagation();deleteHistory(${item.id})">✕</button>
+      </div>
+      <div class="history-preview">${preview}</div>
+      <button class="history-load-btn" onclick="loadHistory(${item.id})">불러오기</button>
+    </div>`;
+  }).join('');
+}
+function deleteHistory(id) {
+  const list = getHistory().filter(i => i.id !== id);
+  saveHistory(list);
+  updateHistoryBadge();
+  renderHistoryList();
+}
+function clearAllHistory() {
+  if (!confirm('전체 히스토리를 삭제할까요?')) return;
+  saveHistory([]);
+  updateHistoryBadge();
+  renderHistoryList();
+}
+function loadHistory(id) {
+  const item = getHistory().find(i => i.id === id);
+  if (!item) return;
+  // 모드 전환
+  switchMode(item.mode);
+  if (item.mode === 'dingtalk' && item.recipient) {
+    selectedRecipient = item.recipient;
+    document.querySelectorAll('.recipient-btn').forEach(b => {
+      b.classList.toggle('active', b.dataset.r === item.recipient);
+    });
+    document.getElementById('recipientHint').textContent = recipientProfiles[item.recipient]?.label || '';
+  }
+  // 입력 복원
+  document.getElementById('inputText').value = item.input;
+  detectLang();
+  // 결과 복원
+  results = item.results;
+  const keys = Object.keys(item.results);
+  clearAllResults();
+  keys.forEach((k, i) => setTimeout(() => showCard(k), i * 80));
+  // 사이드바 닫기
+  toggleHistory();
+}
+// 초기 배지 업데이트
+updateHistoryBadge();
+
 document.addEventListener('keydown', e => { if ((e.ctrlKey||e.metaKey) && e.key==='Enter') analyze(); });
 </script>
+
+<!-- HISTORY SIDEBAR -->
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleHistory()"></div>
+<button class="history-toggle" id="historyToggle" onclick="toggleHistory()">
+  <span>히스토리</span>
+  <span class="history-badge" id="historyBadge">0</span>
+</button>
+<div class="history-sidebar" id="historySidebar">
+  <div class="history-head">
+    <span class="history-head-title">📂 번역 히스토리</span>
+    <div class="history-head-right">
+      <button class="history-clear-btn" onclick="clearAllHistory()">전체 삭제</button>
+      <button class="history-close" onclick="toggleHistory()">✕</button>
+    </div>
+  </div>
+  <div class="history-list" id="historyList">
+    <div class="history-empty">아직 저장된 번역이 없어요.<br>분석하기를 누르면 자동 저장됩니다.</div>
+  </div>
+</div>
+
 </body>
 </html>
