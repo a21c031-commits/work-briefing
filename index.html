@@ -626,6 +626,10 @@ function renderMarkdown(text) {
   html = out.join('\n');
   html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
   html = html.replace(/^【(.+?)】/gm, '<strong>【$1】</strong>');
+  // 번호 목록(1. 2. 3.) 앞에 빈 줄 추가
+  html = html.replace(/\n(\d+\.\s)/g, '\n\n$1');
+  // 대시 목록(- ) 앞에 빈 줄 추가
+  html = html.replace(/\n(-\s)/g, '\n\n$1');
   html = html.replace(/\n/g, '<br>');
   return html;
 }
@@ -652,7 +656,7 @@ function buildPrompt() {
     const rp = RECIPIENT_PROFILES[selectedRecipient];
     return {
       system: `You are Sophie's (김상희/샹시) personal bilingual assistant at AliExpress Korea.\nRespond ONLY with valid JSON — no markdown, no preamble.\n${CONTEXT_TERMS}\nRECIPIENT: ${rp.hint}\nTONE: ${rp.tone_guide}`,
-      user: `Analyze and return ONLY JSON:\n{"summary":"핵심 3줄 요약","translate":"전체 번역본 (한↔중)","report":"${selectedRecipient} 맞춤 딩톡 답장. 톤: ${toneKor}","action":"액션 아이템 3-5개 한국어","oneline":"유관부서 공유용 한 줄 요약 한국어"}\n\n대화:\n---\n${input}\n---`
+      user: `Analyze and return ONLY JSON:\n{"summary":"핵심 3줄 요약. 각 줄은 \\n으로 구분","translate":"전체 번역본 (한↔중). 문단마다 \\n\\n으로 구분. 발화자/문단별로 줄바꿈 유지","report":"${selectedRecipient} 맞춤 딩톡 답장. 톤: ${toneKor}. 항목마다 \\n으로 줄바꿈","action":"액션 아이템 3-5개 한국어. 각 항목은 반드시 \\n으로 구분. 예: 1. 항목A\\n2. 항목B","oneline":"유관부서 공유용 한 줄 요약 한국어"}\n\n대화:\n---\n${input}\n---`
     };
   }
   if (currentMode === 'meeting') {
