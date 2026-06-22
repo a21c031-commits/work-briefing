@@ -725,13 +725,25 @@ async function analyze() {
   } finally { setLoading(false); }
 }
 
+function normalizeLineBreaks(text) {
+  if (!text || typeof text !== 'string') return text;
+  // 번호 목록(1. 2. 3.) 앞에 줄바꿈 보장
+  text = text.replace(/([^\n])(\n?)(\d+\.\s)/g, (m, prev, nl, item) => prev + '\n' + item);
+  // 대시 목록(- ) 앞에 줄바꿈 보장
+  text = text.replace(/([^\n])(\n?)(-\s)/g, (m, prev, nl, item) => prev + '\n' + item);
+  // 중문 항목 기호(•·) 앞에 줄바꿈
+  text = text.replace(/([^\n])([•·])/g, '$1\n$2');
+  return text;
+}
+
 function showCard(key) {
   const el = document.getElementById(`body-${key}`);
   const card = document.getElementById(`card-${key}`);
   const footer = document.getElementById(`footer-${key}`);
   if (!el) return;
   const val = results[key];
-  el.innerHTML = renderMarkdown(typeof val === 'string' ? val : JSON.stringify(val));
+  const normalized = normalizeLineBreaks(typeof val === 'string' ? val : JSON.stringify(val));
+  el.innerHTML = renderMarkdown(normalized);
   el.classList.remove('placeholder');
   card && card.classList.add('show');
   footer && footer.classList.add('show');
@@ -758,7 +770,7 @@ function selectLang(cardId, lang, btn) {
   if (footer) footer.querySelectorAll('.lang-tab').forEach(b => b.classList.toggle('active', b===btn));
   if (langCache[cardId]?.[lang]) {
     const el = document.getElementById(`body-${cardId}`);
-    el.innerHTML = renderMarkdown(langCache[cardId][lang]);
+    el.innerHTML = renderMarkdown(normalizeLineBreaks(langCache[cardId][lang]));
   }
 }
 
@@ -782,7 +794,7 @@ async function translateCard(cardId) {
     const translated = d.content[0].text.trim();
     if (!langCache[cardId]) langCache[cardId]={};
     langCache[cardId][lang] = translated;
-    document.getElementById(`body-${cardId}`).innerHTML = renderMarkdown(translated);
+    document.getElementById(`body-${cardId}`).innerHTML = renderMarkdown(normalizeLineBreaks(translated));
   } catch(e) { console.error(e); } finally { btn.disabled=false; spinner.style.display='none'; }
 }
 
