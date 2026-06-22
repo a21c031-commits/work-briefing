@@ -170,6 +170,9 @@ header { background: var(--surface); border-bottom: 0.5px solid var(--border); h
 .lang-copy-btn { font-size: 11px; padding: 3px 10px; border-radius: 6px; border: 0.5px solid var(--border); background: var(--bg); color: var(--muted); cursor: pointer; font-family: inherit; transition: all 0.15s; }
 .lang-copy-btn:hover { border-color: var(--green); color: var(--green-dark); }
 .lang-copy-btn.copied { background: var(--green-light); color: var(--green-dark); border-color: var(--green); }
+.card-save-btn { font-size: 11px; padding: 3px 10px; border-radius: 6px; border: 0.5px solid var(--border); background: var(--bg); color: var(--muted); cursor: pointer; font-family: inherit; transition: all 0.15s; }
+.card-save-btn:hover { border-color: var(--green); color: var(--green-dark); background: var(--green-light); }
+.card-save-btn.saved { background: var(--green); color: white; border-color: var(--green); }
 .mini-spinner { width: 10px; height: 10px; border: 1.5px solid rgba(0,0,0,0.2); border-top-color: currentColor; border-radius: 50%; animation: spin 0.7s linear infinite; display: none; }
 </style>
 </head>
@@ -283,6 +286,7 @@ header { background: var(--surface); border-bottom: 0.5px solid var(--border); h
           <button class="lang-tab" onclick="selectLang('summary','en',this)">English</button>
           <button class="lang-translate-btn" id="tbtn-summary" onclick="translateCard('summary')"><span class="mini-spinner" id="tspinner-summary"></span>번역</button>
           <button class="lang-copy-btn" id="lcopy-summary" onclick="langCopy('summary')">복사</button>
+          <button class="card-save-btn" id="csave-summary" onclick="saveCard('summary')">💾 저장</button>
         </div>
       </div>
       <div class="result-card" id="card-translate">
@@ -300,6 +304,7 @@ header { background: var(--surface); border-bottom: 0.5px solid var(--border); h
           <button class="lang-tab" onclick="selectLang('translate','en',this)">English</button>
           <button class="lang-translate-btn" id="tbtn-translate" onclick="translateCard('translate')"><span class="mini-spinner" id="tspinner-translate"></span>번역</button>
           <button class="lang-copy-btn" id="lcopy-translate" onclick="langCopy('translate')">복사</button>
+          <button class="card-save-btn" id="csave-translate" onclick="saveCard('translate')">💾 저장</button>
         </div>
       </div>
       <div class="result-card full" id="card-report">
@@ -317,6 +322,7 @@ header { background: var(--surface); border-bottom: 0.5px solid var(--border); h
           <button class="lang-tab" onclick="selectLang('report','en',this)">English</button>
           <button class="lang-translate-btn" id="tbtn-report" onclick="translateCard('report')"><span class="mini-spinner" id="tspinner-report"></span>번역</button>
           <button class="lang-copy-btn" id="lcopy-report" onclick="langCopy('report')">복사</button>
+          <button class="card-save-btn" id="csave-report" onclick="saveCard('report')">💾 저장</button>
         </div>
       </div>
       <div class="result-card" id="card-action">
@@ -334,6 +340,7 @@ header { background: var(--surface); border-bottom: 0.5px solid var(--border); h
           <button class="lang-tab" onclick="selectLang('action','en',this)">English</button>
           <button class="lang-translate-btn" id="tbtn-action" onclick="translateCard('action')"><span class="mini-spinner" id="tspinner-action"></span>번역</button>
           <button class="lang-copy-btn" id="lcopy-action" onclick="langCopy('action')">복사</button>
+          <button class="card-save-btn" id="csave-action" onclick="saveCard('action')">💾 저장</button>
         </div>
       </div>
       <div class="result-card full" id="card-oneline">
@@ -351,6 +358,7 @@ header { background: var(--surface); border-bottom: 0.5px solid var(--border); h
           <button class="lang-tab" onclick="selectLang('oneline','en',this)">English</button>
           <button class="lang-translate-btn" id="tbtn-oneline" onclick="translateCard('oneline')"><span class="mini-spinner" id="tspinner-oneline"></span>번역</button>
           <button class="lang-copy-btn" id="lcopy-oneline" onclick="langCopy('oneline')">복사</button>
+          <button class="card-save-btn" id="csave-oneline" onclick="saveCard('oneline')">💾 저장</button>
         </div>
       </div>
     </div>
@@ -372,6 +380,7 @@ header { background: var(--surface); border-bottom: 0.5px solid var(--border); h
           <button class="lang-tab" onclick="selectLang('minutes','en',this)">English</button>
           <button class="lang-translate-btn" id="tbtn-minutes" onclick="translateCard('minutes')"><span class="mini-spinner" id="tspinner-minutes"></span>번역</button>
           <button class="lang-copy-btn" id="lcopy-minutes" onclick="langCopy('minutes')">복사</button>
+          <button class="card-save-btn" id="csave-minutes" onclick="saveCard('minutes')">💾 저장</button>
         </div>
       </div>
       <div class="result-card" id="card-minutes-ko">
@@ -389,6 +398,7 @@ header { background: var(--surface); border-bottom: 0.5px solid var(--border); h
           <button class="lang-tab" onclick="selectLang('minutes-ko','en',this)">English</button>
           <button class="lang-translate-btn" id="tbtn-minutes-ko" onclick="translateCard('minutes-ko')"><span class="mini-spinner" id="tspinner-minutes-ko"></span>번역</button>
           <button class="lang-copy-btn" id="lcopy-minutes-ko" onclick="langCopy('minutes-ko')">복사</button>
+          <button class="card-save-btn" id="csave-minutes-ko" onclick="saveCard('minutes-ko')">💾 저장</button>
         </div>
       </div>
       <div class="result-card" id="card-issue">
@@ -406,6 +416,7 @@ header { background: var(--surface); border-bottom: 0.5px solid var(--border); h
           <button class="lang-tab" onclick="selectLang('issue','en',this)">English</button>
           <button class="lang-translate-btn" id="tbtn-issue" onclick="translateCard('issue')"><span class="mini-spinner" id="tspinner-issue"></span>번역</button>
           <button class="lang-copy-btn" id="lcopy-issue" onclick="langCopy('issue')">복사</button>
+          <button class="card-save-btn" id="csave-issue" onclick="saveCard('issue')">💾 저장</button>
         </div>
       </div>
     </div>
@@ -427,6 +438,7 @@ header { background: var(--surface); border-bottom: 0.5px solid var(--border); h
           <button class="lang-tab" onclick="selectLang('letter-ko','en',this)">English</button>
           <button class="lang-translate-btn" id="tbtn-letter-ko" onclick="translateCard('letter-ko')"><span class="mini-spinner" id="tspinner-letter-ko"></span>번역</button>
           <button class="lang-copy-btn" id="lcopy-letter-ko" onclick="langCopy('letter-ko')">복사</button>
+          <button class="card-save-btn" id="csave-letter-ko" onclick="saveCard('letter-ko')">💾 저장</button>
         </div>
       </div>
       <div class="result-card full" id="card-letter-zh">
@@ -444,6 +456,7 @@ header { background: var(--surface); border-bottom: 0.5px solid var(--border); h
           <button class="lang-tab" onclick="selectLang('letter-zh','en',this)">English</button>
           <button class="lang-translate-btn" id="tbtn-letter-zh" onclick="translateCard('letter-zh')"><span class="mini-spinner" id="tspinner-letter-zh"></span>번역</button>
           <button class="lang-copy-btn" id="lcopy-letter-zh" onclick="langCopy('letter-zh')">복사</button>
+          <button class="card-save-btn" id="csave-letter-zh" onclick="saveCard('letter-zh')">💾 저장</button>
         </div>
       </div>
       <div class="result-card full" id="card-letter-point">
@@ -461,6 +474,7 @@ header { background: var(--surface); border-bottom: 0.5px solid var(--border); h
           <button class="lang-tab" onclick="selectLang('letter-point','en',this)">English</button>
           <button class="lang-translate-btn" id="tbtn-letter-point" onclick="translateCard('letter-point')"><span class="mini-spinner" id="tspinner-letter-point"></span>번역</button>
           <button class="lang-copy-btn" id="lcopy-letter-point" onclick="langCopy('letter-point')">복사</button>
+          <button class="card-save-btn" id="csave-letter-point" onclick="saveCard('letter-point')">💾 저장</button>
         </div>
       </div>
     </div>
@@ -727,12 +741,26 @@ async function analyze() {
 
 function normalizeLineBreaks(text) {
   if (!text || typeof text !== 'string') return text;
+
+  // JSON 배열로 저장된 액션 아이템 처리 (["항목1","항목2"] 형태)
+  const trimmed = text.trim();
+  if (trimmed.startsWith('[') && trimmed.endsWith(']')) {
+    try {
+      const arr = JSON.parse(trimmed);
+      if (Array.isArray(arr)) {
+        text = arr.map((item, i) => (i+1) + '. ' + item).join('\n');
+      }
+    } catch(e) {
+      text = text.replace(/^\["|"\]$/g,'').replace(/",\s*"/g, '\n');
+    }
+  }
+
   // 번호 목록(1. 2. 3.) 앞에 줄바꿈 보장
-  text = text.replace(/([^\n])(\n?)(\d+\.\s)/g, (m, prev, nl, item) => prev + '\n' + item);
-  // 대시 목록(- ) 앞에 줄바꿈 보장
-  text = text.replace(/([^\n])(\n?)(-\s)/g, (m, prev, nl, item) => prev + '\n' + item);
-  // 중문 항목 기호(•·) 앞에 줄바꿈
-  text = text.replace(/([^\n])([•·])/g, '$1\n$2');
+  text = text.replace(/([^\n])(\d+\.\s)/g, '$1\n$2');
+  // 대시/점 목록 앞에 줄바꿈
+  text = text.replace(/([^\n])([-·•]\s)/g, '$1\n$2');
+  // 마침표/물음표 뒤 바로 이어지는 텍스트 줄바꿈 (번역본 단락 분리)
+  text = text.replace(/([.?!。？！])\s+([가-힣A-Za-z\u4e00-\u9fff])/g, '$1\n$2');
   return text;
 }
 
@@ -951,6 +979,17 @@ async function saveCurrentToHistory() {
   const orig = btn.innerHTML;
   btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><polyline points="20 6 9 17 4 12"/></svg> 저장됨!';
   setTimeout(()=>{ btn.innerHTML=orig; },1800);
+}
+
+async function saveCard(cardKey) {
+  const inputText = textarea.value.trim();
+  if (!inputText || !results[cardKey]) { alert('먼저 분석하기를 눌러주세요.'); return; }
+  const btn = document.getElementById(`csave-${cardKey}`);
+  btn.textContent = '저장 중...';
+  await saveToSupabase(inputText, currentMode, selectedRecipient, results, true);
+  btn.textContent = '✅ 저장됨!';
+  btn.classList.add('saved');
+  setTimeout(() => { btn.textContent = '💾 저장'; btn.classList.remove('saved'); }, 2000);
 }
 
 document.addEventListener('keydown', e => { if ((e.ctrlKey||e.metaKey)&&e.key==='Enter') analyze(); });
