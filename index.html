@@ -640,10 +640,7 @@ function renderMarkdown(text) {
   html = out.join('\n');
   html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
   html = html.replace(/^【(.+?)】/gm, '<strong>【$1】</strong>');
-  // 번호 목록(1. 2. 3.) 앞에 빈 줄 추가
-  html = html.replace(/\n(\d+\.\s)/g, '\n\n$1');
-  // 대시 목록(- ) 앞에 빈 줄 추가
-  html = html.replace(/\n(-\s)/g, '\n\n$1');
+  // 번호 목록: 번호와 내용 사이 빈 줄만 제거 (이미 normalizeLineBreaks에서 처리됨)
   html = html.replace(/\n/g, '<br>');
   return html;
 }
@@ -748,19 +745,21 @@ function normalizeLineBreaks(text) {
     try {
       const arr = JSON.parse(trimmed);
       if (Array.isArray(arr)) {
-        text = arr.map((item, i) => (i+1) + '. ' + item).join('\n');
+        // 배열이면 바로 리턴 — 번호+내용이 한 줄에 같이 있어야 함
+        return arr.map((item, i) => (i+1) + '. ' + item.trim()).join('\n');
       }
     } catch(e) {
       text = text.replace(/^\["|"\]$/g,'').replace(/",\s*"/g, '\n');
     }
   }
 
-  // 번호 목록(1. 2. 3.) 앞에 줄바꿈 보장
-  text = text.replace(/([^\n])(\d+\.\s)/g, '$1\n$2');
-  // 대시/점 목록 앞에 줄바꿈
-  text = text.replace(/([^\n])([-·•]\s)/g, '$1\n$2');
-  // 마침표/물음표 뒤 바로 이어지는 텍스트 줄바꿈 (번역본 단락 분리)
-  text = text.replace(/([.?!。？！])\s+([가-힣A-Za-z\u4e00-\u9fff])/g, '$1\n$2');
+  // 번호 목록(1. 2. 3.) — 번호와 내용이 이미 같은 줄이면 그대로 두고,
+  // 번호 뒤 내용이 없는 줄(번호만 단독으로 있는 경우)은 다음 줄과 합치기
+  text = text.replace(/(\d+\.\s*)\n+([^\d\n])/g, '$1$2');
+
+  // 발화자 구분자 (/ 또는 。다음 새 발화) — 번역본 단락 분리
+  text = text.replace(/\s*\/\s*/g, '\n');
+
   return text;
 }
 
